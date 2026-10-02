@@ -18,7 +18,7 @@ export const GROUPS: Group[] = [
   { k: 'giving', n: 'Giving', sec: 'exp' },
   { k: 'ownerloan', n: "Owner's Loan to Business", sec: 'exp' },
 ];
-export const GMAP: Record<string, Group & { i: number }> = Object.fromEntries(GROUPS.map((g, i) => [g.k, { ...g, i }]));
+export const GMAP: any = Object.fromEntries(GROUPS.map((g, i) => [g.k, { ...g, i }]));
 export const SECTIONS: { k: SectionKey; n: string }[] = [
   { k: 'in', n: 'Income' }, { k: 'sav', n: 'Savings & Investments' }, { k: 'exp', n: 'Expenses' },
 ];

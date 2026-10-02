@@ -281,6 +281,7 @@ export class SupabaseFiles implements FileStore {
   private urls = new Map<string, { url: string; exp: number }>();
   constructor(private sb: SupabaseClient) {}
   async upload(f: Blob & { name?: string }) {
+    if (browserOffline()) throw new Error('you’re offline – attach it again when you’re connected');
     const ext = (f.name?.match(/\.([a-z0-9]+)$/i)?.[1] || (f.type.split('/')[1] || 'bin')).toLowerCase();
     const id = crypto.randomUUID() + '.' + ext;
     const { error } = await this.sb.storage.from('files').upload(id, f, { contentType: f.type || undefined, upsert: false });

@@ -29,17 +29,21 @@ test('demo on the reference seed reproduces the October baseline', async ({ page
   expect(Math.abs(got.people - B.people.P)).toBeLessThan(0.005);
 });
 
-test('smoke screen: add and delete an entry through the write layer', async ({ page }) => {
-  await page.goto('./?synthetic');
+test('the app works on the synthetic fixture: every screen renders, capture saves', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto('./?synthetic&me=M');
   await loaded(page);
-  await page.waitForSelector('#sm-form');
-  await page.fill('#sm-amt', '12.34');
-  await page.selectOption('#sm-it', 'groceries');
-  await page.fill('#sm-store', 'Test Shop');
-  await page.click('#sm-form button[type=submit]');
-  await page.waitForSelector('text=Test Shop');
-  const k = await page.evaluate(() => Object.keys((window as any).__pn.S.months).find(k => Object.values((window as any).__pn.S.months[k].txns || {}).some((t: any) => t?.store === 'Test Shop')));
-  expect(k).toBeTruthy();
-  await page.click('[data-a="smokedel"]');
-  await page.waitForSelector('text=Test Shop', { state: 'detached' });
+  await expect(page.locator('h1')).toHaveText('Hi Munny');
+  for (const v of ['home', 'budget', 'people', 'accounts', 'plan', 'year', 'milestones', 'more', 'items']) {
+    await page.evaluate(v => { const p = (window as any).__pn; p.closeAll(); p.S.ui.view = v; p.render(); }, v);
+    await expect(page.locator('main .pagehead')).toBeVisible();
+  }
+  await page.click('.rail .capture-big, .tabbar .capture');
+  await page.fill('#tx-amt', '12.34');
+  await page.click('[data-quick="groceries"]');
+  await page.click('#tx-save');
+  await expect.poll(() => page.evaluate(() => (window as any).__pn.monthCalc('2030-01').lines.find((l: any) => l.id === 'groceries').act)).toBeCloseTo(1750 + 12.34, 2);
+  expect(errors).toEqual([]);
 });

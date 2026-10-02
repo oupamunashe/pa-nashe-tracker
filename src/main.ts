@@ -12,7 +12,6 @@ import { msCalc } from './calc/milestones';
 import { peopleCalc } from './calc/people';
 import { planCalc } from './calc/plan';
 import { yearCalc } from './calc/year';
-import { hooks } from './core/hooks';
 import { S, lsDel, lsGet } from './core/state';
 import type { Who } from './core/types';
 import { storeFromBackup } from './data/adapter';
@@ -20,17 +19,16 @@ import { subscribe } from './data/db';
 import { MemoryAdapter, MemoryFiles } from './data/memory';
 import { LocalStore, clearAllLocal } from './data/offline';
 import { SupabaseAdapter, SupabaseFiles } from './data/supabase';
-import { refreshSheet, toast } from './ui/sheet';
+import { closeAll, toast } from './ui/sheet';
+import { sheetLine } from './ui/sheets/line';
+import { sheetSettings, sheetWho } from './ui/sheets/settings';
+import { sheetTrend } from './ui/sheets/trend';
+import { sheetTxn } from './ui/sheets/txn';
+import { sheetImport } from './io/import';
+import { personFromText } from './calc/statement';
 import { sheetPassword, showMessage, showPrivate, showSignIn } from './ui/signin';
-import { setNetStatus, smokeRender, smokeShell } from './ui/smoke';
+import { render, setNetStatus, shell } from './ui/shell';
 
-let renderPending = false;
-hooks.toast = toast;
-hooks.render = () => smokeRender();
-hooks.scheduleRender = () => {
-  if (renderPending) return; renderPending = true;
-  requestAnimationFrame(() => { renderPending = false; smokeRender(); refreshSheet(); });
-};
 
 function stillConnecting() {
   setTimeout(() => {
@@ -48,10 +46,10 @@ async function startDemo() {
   const me = q.get('me');
   if (me === 'P' || me === 'M') S.me = me as Who; else if (!S.me) S.me = 'P';
   Object.assign(S, { db, assets: new MemoryFiles() });
-  smokeShell();
+  shell(); render();
   subscribe();
   // test hooks (demo mode only – never in a production build)
-  Object.assign(window as any, { __pn: { S, db, monthCalc, peopleCalc, balances, planCalc, yearCalc, msCalc } });
+  Object.assign(window as any, { __pn: { S, db, monthCalc, peopleCalc, balances, planCalc, yearCalc, msCalc, render, closeAll, sheetTxn, sheetLine, sheetWho, sheetTrend, sheetSettings, sheetImport, personFromText } });
 }
 
 /* ---------- production: Supabase ---------- */
@@ -80,7 +78,7 @@ async function startApp() {
     const db = new SupabaseAdapter(sb, local, msg => toast(msg, 'bad'));
     Object.assign(S, { db, assets: new SupabaseFiles(sb), user: { id: s.user.id, email } });
     Object.assign(session, { active: true, email, pending: () => db.pendingCount, signOut: () => signOut(db, local) });
-    smokeShell(); inShell = true;
+    shell(); inShell = true; render();
     db.onStatus(setNetStatus);
     subscribe();
     stillConnecting();

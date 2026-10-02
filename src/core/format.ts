@@ -3,7 +3,7 @@ import { MONTHS } from './constants';
 
 export const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 export const r2 = (n: unknown) => Math.round((+(n as number) || 0) * 100) / 100;
-export const sum = <T>(a: T[], f: (x: T) => unknown = x => x) => a.reduce((t, x) => t + (+(f(x) as number) || 0), 0);
+export const sum = (a: any[], f: (x: any) => unknown = x => x): number => a.reduce((t, x) => t + (+(f(x) as number) || 0), 0);
 export function fmt(n: unknown, dp = 2) {
   const v = +(n as number) || 0;
   const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
