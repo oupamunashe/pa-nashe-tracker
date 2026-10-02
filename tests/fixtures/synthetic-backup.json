@@ -1,0 +1,79 @@
+{
+  "exported": "synthetic test fixture – fake people, fake amounts",
+  "config": {
+    "main": {
+      "people": {
+        "P": { "n": "Piepie", "full": "Alex Q Testperson", "alias": "Lexi" },
+        "M": { "n": "Munny", "full": "Sam Testperson", "alias": "Sammy" }
+      },
+      "scenario": "1",
+      "planBase": 10000,
+      "scen": {
+        "1": { "name": "Test plan", "desc": "Synthetic scenario", "b": { "retire": [0.1, 0], "household": [0.3, 0], "sultana": [0.4, 0] } },
+        "2": { "name": "Two", "desc": "", "b": {} },
+        "3": { "name": "Three", "desc": "", "b": {} }
+      },
+      "calc": {},
+      "rules": [["SHOPRITE", "groceries"]]
+    },
+    "catalog": {
+      "items": {
+        "salary-a": { "n": "Salary A", "g": "earned", "o": 1, "rec": true },
+        "salary-b": { "n": "Salary B", "g": "earned", "o": 2, "rec": true },
+        "tfsa": { "n": "TFSA Contributions", "g": "lt", "o": 3, "pb": "retire", "rec": true, "fl": [{ "a": "tfsa_p", "s": 0.5, "x": 1 }, { "a": "tfsa_m", "s": 0.5, "x": 1 }] },
+        "rent": { "n": "Rent", "g": "housing", "o": 4, "pb": "sultana", "rec": true },
+        "groceries": { "n": "Groceries", "g": "household", "o": 5, "pb": "household" },
+        "party": { "n": "Party", "g": "onceoff", "o": 6, "pb": "onceoff" }
+      }
+    },
+    "accounts": {
+      "accounts": {
+        "tfsa_p": { "n": "TFSA Piepie", "t": "savings", "ow": "P", "open": 100, "od": "2030-01-01" },
+        "tfsa_m": { "n": "TFSA Munny", "t": "savings", "ow": "M", "open": 100, "od": "2030-01-01" },
+        "card": { "n": "Test Card", "t": "credit", "ow": "J", "open": null, "od": "2030-01-01", "chk": "Confirm the card balance" },
+        "bank_p": { "n": "Everyday Piepie", "t": "bank", "ow": "P", "open": null, "od": "2030-01-01", "track": false }
+      }
+    }
+  },
+  "months": {
+    "2030-01": {
+      "y": 2030, "m": 1,
+      "lines": {
+        "salary-a": { "b": 6000, "al": [{ "w": "P", "v": 100, "u": "pct" }], "rec": true },
+        "salary-b": { "b": 4000, "al": [{ "w": "M", "v": 4000, "u": "amt" }], "rec": true },
+        "tfsa": { "b": 1000, "al": [{ "w": "P", "v": 50, "u": "pct" }, { "w": "M", "v": 50, "u": "pct" }], "rec": true },
+        "rent": { "b": 4000, "al": [{ "w": "P", "v": 4000, "u": "amt" }], "rec": true },
+        "groceries": { "b": 3000 },
+        "party": { "b": 500 }
+      },
+      "txns": {
+        "t1": { "d": "2030-01-28", "mo": "2030-01", "it": "salary-a", "amt": 6000, "src": "import" },
+        "t2": { "d": "2030-01-28", "mo": "2030-01", "it": "salary-b", "amt": 4000, "src": "import" },
+        "t3": { "d": "2030-01-28", "mo": "2030-01", "it": "tfsa", "amt": 1000, "src": "import" },
+        "t4": { "d": "2030-01-28", "mo": "2030-01", "it": "rent", "amt": 4000, "src": "import" },
+        "t5": { "d": "2030-01-10", "mo": "2030-01", "it": "groceries", "amt": 1250.5, "src": "app", "store": "Test Store", "by": "P", "pay": "card", "at": 1 },
+        "t6": { "d": "2030-01-12", "mo": "2030-01", "it": "groceries", "amt": 499.5, "src": "app", "by": "M", "at": 2 },
+        "t7": null
+      },
+      "ledger": {
+        "l1": { "d": "2030-01-15", "a": "card", "amt": 0, "ty": "check", "bal": 2000, "ds": "Balance confirmed", "src": "check", "at": 3 },
+        "l2": { "d": "2030-01-20", "a": "card", "amt": 50, "ty": "interest", "ds": "Interest", "src": "statement", "at": 4 }
+      }
+    }
+  },
+  "milestones": {
+    "trip": {
+      "n": "Test Trip", "st": "active", "start": "2030-03-01", "end": "2030-03-10", "usd": 20, "note": "", "o": 1,
+      "lines": {
+        "l1": { "n": "Flights", "sec": "expense", "grp": "Travel", "b": 3000, "cur": "ZAR", "o": 1 },
+        "l2": { "n": "Hotel", "sec": "expense", "grp": "Stay", "b": 100, "cur": "USD", "o": 2 },
+        "l3": { "n": "Savings", "sec": "income", "grp": "Funding", "b": 5000, "cur": "ZAR", "o": 3 }
+      },
+      "txns": {
+        "p1": { "d": "2030-02-01", "l": "l2", "amt": 50, "cur": "USD" },
+        "p2": { "d": "2030-02-02", "l": "l3", "amt": 2000, "cur": "ZAR" }
+      },
+      "files": []
+    }
+  }
+}

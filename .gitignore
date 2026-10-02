@@ -1,0 +1,22 @@
+# private financial data – never commit
+private/
+# secrets
+.env
+.env.*
+!.env.example
+*service-role*
+# build & tooling
+node_modules/
+dist/
+dev-dist/
+coverage/
+test-results/
+playwright-report/
+.DS_Store
+*.log
+__pycache__/
+*.pyc
+# local Claude Code settings
+.claude/settings.local.json
+# the original package contains private/
+*.zip
