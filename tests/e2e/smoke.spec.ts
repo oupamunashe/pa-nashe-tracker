@@ -28,3 +28,18 @@ test('demo on the reference seed reproduces the October baseline', async ({ page
   expect(Math.abs(got.pool - B.bal.pool_m.bal)).toBeLessThan(0.005);
   expect(Math.abs(got.people - B.people.P)).toBeLessThan(0.005);
 });
+
+test('smoke screen: add and delete an entry through the write layer', async ({ page }) => {
+  await page.goto('./?synthetic');
+  await loaded(page);
+  await page.waitForSelector('#sm-form');
+  await page.fill('#sm-amt', '12.34');
+  await page.selectOption('#sm-it', 'groceries');
+  await page.fill('#sm-store', 'Test Shop');
+  await page.click('#sm-form button[type=submit]');
+  await page.waitForSelector('text=Test Shop');
+  const k = await page.evaluate(() => Object.keys((window as any).__pn.S.months).find(k => Object.values((window as any).__pn.S.months[k].txns || {}).some((t: any) => t?.store === 'Test Shop')));
+  expect(k).toBeTruthy();
+  await page.click('[data-a="smokedel"]');
+  await page.waitForSelector('text=Test Shop', { state: 'detached' });
+});

@@ -11,17 +11,26 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "tsx scripts/check.ts",
+    "seed": "tsx scripts/seed.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^20.19.43",
+    "@types/ws": "^8.18.2",
+    "fake-indexeddb": "^6.2.5",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vite": "^6.4.3",
-    "vitest": "^3.2.7"
+    "vitest": "^3.2.7",
+    "ws": "^8.22.0"
   },
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@supabase/supabase-js": "^2.109.0",
+    "idb": "^8.0.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }

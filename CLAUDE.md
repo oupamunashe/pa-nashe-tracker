@@ -48,6 +48,8 @@ Stack: Vite + TypeScript (no UI framework) · Supabase (Postgres JSON documents,
 - `npm run test:unit` / `npm run test:e2e` – one half only; `PN_NO_PRIVATE=1` simulates a checkout without `private/` (CI)
 - `npm run typecheck` – `tsc --noEmit`
 - `npm run seed -- private/data/live-backup-2026-10-02.json` – load a backup into Supabase (asks for confirmation; uploads PDFs; rewrites asset ids)
+- `npm run check` – read-only health check of the Supabase project (sign-up off, members, RLS, counts; prints no emails or figures)
+- `npm run seed -- <backup.json> --yes` – same as above without the question (only when the owners have said so)
 - `npm run build` – production build; deployment happens via GitHub Actions on push to `main`
 
 ## Working style

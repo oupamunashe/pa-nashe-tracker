@@ -5,6 +5,7 @@ import type { DocStore, FileStore } from '../data/adapter';
 
 export function lsGet(k: string): string | null { try { return localStorage.getItem(k) || null; } catch (e) { return null; } }
 export function lsSet(k: string, v: string) { try { localStorage.setItem(k, v); } catch (e) {} }
+export function lsDel(k: string) { try { localStorage.removeItem(k); } catch (e) {} }
 
 export interface UiState {
   view: string; month: string | null; year: string | null; yearMode: string; acc: string | null; msId: string | null; people: string;
