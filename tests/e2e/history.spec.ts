@@ -35,7 +35,7 @@ test('synthetic: month dropdown, last year on Home, year-on-year comparison', as
   await expect(k.nth(0)).toContainText(`Money in${fmt0(cur.income)}2029: R5,000 · +${fmt0(cur.income - 5000)}`);
   await expect(k.nth(2)).toContainText(`Spent${fmt0(cur.exp)}2029: R5,300`);
   const rent = page.locator('table.cmp tr.click', { hasText: 'Rent' });
-  await expect(rent.locator('td')).toHaveText(['Rent', 'R4,000', 'R3,500', '+R500', '+14%']);
+  await expect(rent.locator('td')).toHaveText(['Rent', 'R4,000', 'R3,500', '+R500', '+14.3%']);
   await expect(rent.locator('td').nth(3)).toHaveClass('yoy-bad');                    // spending more: red
   await expect(rent.locator('td').nth(3)).toHaveCSS('color', 'rgb(248, 113, 113)');  // #F87171
   const income = page.locator('table.cmp tr.g', { hasText: 'Income' }).locator('td').nth(3);
@@ -47,6 +47,15 @@ test('synthetic: month dropdown, last year on Home, year-on-year comparison', as
   const [p0, p1, p2] = [await pad('lv0'), await pad('lv1'), await pad('lv2')];
   expect(p0).toBeGreaterThanOrEqual(12); expect(p1).toBeGreaterThan(p0); expect(p2).toBeGreaterThan(p1);
   await expect(page.locator('table.cmp thead th').first()).toHaveText('Jan');       // like for like: January only
+
+  // picked the other way round (view 2029, compare with 2030): still 2030 − 2029
+  await page.selectOption('[data-a="yearsel"]', '2029');
+  await page.selectOption('[data-a="cmpyear"]', '2030');
+  await expect(page.locator('main h2').filter({ hasText: 'compared with' })).toHaveText('2030 compared with 2029');
+  await expect(page.locator('table.cmp thead th')).toHaveText(['Jan', '2030', '2029', 'Change', '%']);
+  await expect(page.locator('table.cmp tr.click', { hasText: 'Rent' }).locator('td')).toHaveText(['Rent', 'R4,000', 'R3,500', '+R500', '+14.3%']);
+  const sal = page.locator('table.cmp tr.click', { hasText: 'Salary A' }).locator('td');
+  await expect(sal.nth(3)).toHaveClass('yoy-good');                                   // earned more in 2030: green
 });
 
 test('synthetic: months from the old workbooks (before 2026) show nothing as due', async ({ page }) => {

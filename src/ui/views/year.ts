@@ -1,5 +1,6 @@
 /* ===================== YEAR (from prototype ui2.js) ===================== */
 import { balances } from '../../calc/balances';
+import { compareOrder, yoyChange, yoyTone } from '../../calc/compare';
 import { yearCalc } from '../../calc/year';
 import { GROUPS, MONTHS, SECTIONS } from '../../core/constants';
 import { esc, fmt0, mShort, pct, sum } from '../../core/format';
@@ -56,7 +57,8 @@ export function viewYear() {
 
 /* Two years side by side, like for like: only the months both years have, so a part year (2023, or the year
    in progress) is compared with the same months of the other year. Same rows as the table below. */
-function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
+function compareYears(picked: string, other: string, mk: 'a' | 'b', mode: string) {
+  const [y, cy] = compareOrder(picked, other);   // y = the later year (current), cy = the earlier one (base)
   const A = yearCalc(y), C = yearCalc(cy);
   // actuals: a month counts once it has actual entries in both years (a month budgeted ahead has none yet)
   const live = (Y, i) => !!S.months[Y.keys[i]] && (mk === 'b' || ['income', 'sav', 'exp'].some(f => Math.abs(Y.tot[i].a[f]) > 0.004));
@@ -67,9 +69,10 @@ function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
   const tot = (Y, f) => sum(idx, i => f(Y.tot[i][mk]));
   const itemSum = (Y, id) => { const x = Y.items.find(z => z.id === id); return x ? sum(idx, i => x[mk][i]) : 0; };
   // up is good for money in, saved and left over; up is bad for spent
+  const sign = (n: number) => (n > 0 ? '+' : '');
   const chg = (a: number, c: number, upGood: boolean) => {
-    const d = a - c, cls = Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'yoy-good' : 'yoy-bad';
-    return `<td class="${cls}">${Math.abs(d) < 0.5 ? '–' : (d > 0 ? '+' : '') + fmt0(d)}</td><td class="${cls}">${Math.abs(c) > 0.5 && Math.abs(d) >= 0.5 ? (d > 0 ? '+' : '') + pct(d / Math.abs(c)).replace('-', '–') : ''}</td>`;
+    const { d, pct: p } = yoyChange(a, c), t = yoyTone(d, upGood), cls = t && 'yoy-' + t;
+    return `<td class="${cls}">${t ? sign(d) + fmt0(d) : '–'}</td><td class="${cls}">${t && p !== null ? sign(d) + pct(p, 1).replace('-', '–') : ''}</td>`;
   };
   const row = (label: string, a: number, c: number, upGood: boolean, attrs = '', cls = '', lv = 0) =>
     `<tr class="${cls}" ${attrs}><td class="lv${lv}">${label}</td><td>${fmt0(a)}</td><td class="muted">${fmt0(c)}</td>${chg(a, c, upGood)}</tr>`;
@@ -88,8 +91,8 @@ function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
     });
   });
   rows += row('Left over', tot(A, t => t.surplus), tot(C, t => t.surplus), true, '', 't');
-  const kpi = (n: string, f, upGood: boolean) => { const a = tot(A, f), c = tot(C, f), d = a - c;
-    return `<div class="kpi"><span>${n}</span><b>${fmt0(a)}</b><span>${cy}: ${fmt0(c)} · <span class="${Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'yoy-good' : 'yoy-bad'}">${Math.abs(d) < 0.5 ? 'same' : (d > 0 ? '+' : '') + fmt0(d)}</span></span></div>`; };
+  const kpi = (n: string, f, upGood: boolean) => { const a = tot(A, f), c = tot(C, f), { d } = yoyChange(a, c), t = yoyTone(d, upGood);
+    return `<div class="kpi"><span>${n}</span><b>${fmt0(a)}</b><span>${cy}: ${fmt0(c)} · <span class="${t && 'yoy-' + t}">${t ? sign(d) + fmt0(d) : 'same'}</span></span></div>`; };
   const lab = idx.map(i => MONTHS[i].slice(0, 3));
   return `<section class="panel"><div class="panel-h"><h2>${y} compared with ${cy}</h2><span class="small muted">${mode === 'act' ? 'Actual' : 'Budget'} · ${span}</span></div>
       <p class="small muted" style="margin:-4px 0 12px">Only months both years have${mk === 'a' ? ' actual entries for' : ''} are compared${idx.length < 12 ? `, so ${y} and ${cy} both cover ${span}` : ''}.</p>
