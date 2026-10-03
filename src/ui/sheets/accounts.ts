@@ -1,4 +1,5 @@
 /* ===================== account sheets (from prototype ui3.js) ===================== */
+import { POTS } from '../../calc/pots';
 import { balances } from '../../calc/balances';
 import { ACC_TYPES } from '../../core/constants';
 import { esc, fmt, mkey, r2, slug, todayISO, uid } from '../../core/format';
@@ -84,6 +85,7 @@ export function sheetAccount(id) {
       <div class="field"><label for="ac-od">Opening date</label><input id="ac-od" class="inp" type="date" value="${a.od || ''}"></div></div>
       <div class="f2"><div class="field"><label for="ac-goal">Goal amount</label><input id="ac-goal" class="inp num" inputmode="decimal" value="${a.goal ?? ''}"></div>
       <div class="field"><label for="ac-gd">Goal date</label><input id="ac-gd" class="inp" type="date" value="${a.gd || ''}"></div></div>
+      <div class="field"><label for="ac-pot">Pot (savings and goals)</label><select id="ac-pot" class="inp"><option value="">Automatic – from the linked budget lines</option>${POTS.map(p => `<option value="${p.k}" ${a.pot === p.k ? 'selected' : ''}>${p.n} · ${p.d}</option>`).join('')}</select></div>
       <div class="f2"><div class="field"><label for="ac-lim">Credit limit</label><input id="ac-lim" class="inp num" inputmode="decimal" value="${a.limit ?? ''}"></div>
       <div class="field"><label for="ac-rate">Interest % a year</label><input id="ac-rate" class="inp num" inputmode="decimal" value="${a.rate ?? ''}"></div></div>
       <div class="field"><label for="ac-note">Notes</label><textarea id="ac-note" class="inp">${esc(a.note || '')}</textarea></div>
@@ -98,6 +100,7 @@ export function sheetAccount(id) {
       o.od = val(el, '#ac-od') || null;
       ['goal', 'limit', 'rate'].forEach(f => { const v = val(el, '#ac-' + (f === 'limit' ? 'lim' : f)); o[f] = v === '' ? null : r2(parseFloat(v)); });
       o.gd = val(el, '#ac-gd') || null;
+      o.pot = val(el, '#ac-pot') || null;
       if (o.t === 'bank' && o.track === undefined) o.track = false;
       const nid = id || slug(n) + '-' + Math.random().toString(36).slice(2, 5);
       await saveAccount(nid, o); toast('Saved ' + n); closeSheet();

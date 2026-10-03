@@ -1,5 +1,6 @@
 /* ===================== HOME (from prototype ui1.js) ===================== */
 import { balances } from '../../calc/balances';
+import { potTotals } from '../../calc/pots';
 import { monthCalc } from '../../calc/month';
 import { peopleCalc } from '../../calc/people';
 import { planCalc } from '../../calc/plan';
@@ -68,6 +69,10 @@ export function viewHome(k) {
       ${recent.length ? `<ul class="list" style="margin:0 -16px -16px">${recent.map(t => txnLi(t, k)).join('')}</ul>` : `<p class="muted">Nothing captured in the app for ${MONTHS[+k.slice(5) - 1]} yet. Tap <b>Add a spend</b> after your next shop.</p>`}
     </section>
   </div>
+  <section class="panel">
+    <div class="panel-h"><h2>Savings pots</h2><button class="btn sm ghost" data-a="nav" data-v="accounts">See accounts</button></div>
+    <div class="kpis three pots-home">${potTotals(bal).map(p => `<button class="kpi" data-a="openpot" data-p="${p.k}"><span>${esc(p.n)} · ${esc(p.d)}</span><b>${fmt0(p.total)}</b>${p.goals ? `<span>${fmt0(p.goals)} set aside for goals</span>` : ''}</button>`).join('')}</div>
+  </section>
   <section class="grid2">${['P', 'M'].map(w => personMini(w, k)).join('')}</section>
   </div>`;
 }

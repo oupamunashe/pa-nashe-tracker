@@ -32,7 +32,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pm-mark.png'],
+      includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'pm-mark.png'],
       manifest: {
         name: 'Pa-Nashe Tracker',
         short_name: 'Pa-Nashe',

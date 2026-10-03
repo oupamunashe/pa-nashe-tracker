@@ -24,6 +24,7 @@ export interface Account {
   n: string; t: AccType; ow: Owner; open: number | null; od: string | null;
   bank?: string; held?: string; goal?: number | null; gd?: string | null; limit?: number | null; rate?: number | null;
   minp?: number; due?: number; bf?: boolean; track?: boolean; note?: string; chk?: string; closed?: boolean;
+  pot?: 'short' | 'medium' | 'long' | null; tfsa?: boolean;
 }
 export interface AccountsCfg { accounts: Record<string, Account> }
 

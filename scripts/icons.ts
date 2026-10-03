@@ -1,8 +1,10 @@
 /* npm run icons – the app's logo and icons from the owners' artwork “Linktree Art.png” (project root, git-ignored:
    it is a personal photo). Only the white “PM.” mark is lifted out of it – pixel by pixel, near-white and
    unsaturated = mark, everything else transparent – so none of the photo ends up in the published files.
-   Writes public/pm-mark.png (white mark, transparent, used in the app header via a CSS mask) and the icons on
-   the app's base colour #1C1E26: favicon.ico (32), apple-touch-icon (180), icon-192, icon-512, maskable 512. */
+   Writes public/pm-mark.png (white mark, transparent, used in the app header via a CSS mask); favicon.ico (32),
+   icon-192 and icon-512 as the mark on a transparent background; favicon.svg, the same mark that turns dark
+   on light browser tabs (a white mark alone would vanish there); and, on the app's base colour #1C1E26,
+   apple-touch-icon (180 – iOS fills transparency with black) and the maskable 512 (Android crops it to a shape). */
 import { existsSync, writeFileSync } from 'node:fs';
 import sharp from 'sharp';
 
@@ -58,23 +60,30 @@ console.log(`mark found at ${bx0},${by0} – ${mw}×${mh}px (aspect ${(mw / mh).
 
 await sharp(markPng).resize({ height: 256 }).png().toFile('public/pm-mark.png');
 
-/** the mark centred on #1C1E26, `share` of the width */
-async function icon(size: number, share: number) {
+/** the mark centred on #1C1E26 (or on transparency with `clear`), `share` of the width */
+async function icon(size: number, share: number, clear = false) {
   const w = Math.round(size * share), h = Math.round(w * mh / mw);
   const m = await sharp(markPng).resize({ width: w, height: h }).png().toBuffer();
-  return sharp({ create: { width: size, height: size, channels: 4, background: { ...BG, alpha: 1 } } })
+  return sharp({ create: { width: size, height: size, channels: 4, background: { ...BG, alpha: clear ? 0 : 1 } } })
     .composite([{ input: m, left: Math.round((size - w) / 2), top: Math.round((size - h) / 2) }]).png().toBuffer();
 }
-writeFileSync('public/icon-192.png', await icon(192, 0.72));
-writeFileSync('public/icon-512.png', await icon(512, 0.72));
+writeFileSync('public/icon-192.png', await icon(192, 0.86, true));
+writeFileSync('public/icon-512.png', await icon(512, 0.86, true));
 writeFileSync('public/icon-maskable-512.png', await icon(512, 0.56));   // inside the 80% safe zone Android crops to
 writeFileSync('public/apple-touch-icon.png', await icon(180, 0.72));
 
 // favicon.ico: one 32×32 PNG in an ICO container (supported by every current browser)
-const fav = await icon(32, 0.86);
+const fav = await icon(32, 0.94, true);
 const ico = Buffer.alloc(22);
 ico.writeUInt16LE(0, 0); ico.writeUInt16LE(1, 2); ico.writeUInt16LE(1, 4);                 // header: icon, 1 image
 ico.writeUInt8(32, 6); ico.writeUInt8(32, 7); ico.writeUInt8(0, 8); ico.writeUInt8(0, 9);   // 32×32, no palette
 ico.writeUInt16LE(1, 10); ico.writeUInt16LE(32, 12); ico.writeUInt32LE(fav.length, 14); ico.writeUInt32LE(22, 18);
 writeFileSync('public/favicon.ico', Buffer.concat([ico, fav]));
-console.log('written: public/pm-mark.png, favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png, icon-maskable-512.png');
+// favicon.svg: the mark as an alpha mask over one colour – #1C1E26 on light tabs, near-white on dark ones
+const m64 = (await sharp(markPng).resize({ height: 96 }).png().toBuffer()).toString('base64'), vw = Math.round(96 * mw / mh);
+writeFileSync('public/favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${vw} ${vw}">
+<style>rect{fill:#1C1E26}@media (prefers-color-scheme:dark){rect{fill:#E8E9EE}}</style>
+<mask id="m" style="mask-type:alpha"><image width="${vw}" height="96" y="${(vw - 96) / 2}" xlink:href="data:image/png;base64,${m64}"/></mask>
+<rect width="${vw}" height="${vw}" mask="url(#m)"/></svg>
+`);
+console.log('written: public/pm-mark.png, favicon.ico, favicon.svg, apple-touch-icon.png, icon-192.png, icon-512.png, icon-maskable-512.png');

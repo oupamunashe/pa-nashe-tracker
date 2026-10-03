@@ -1,7 +1,7 @@
 /* TFSA goal progress per SA tax year (1 March – 28/29 February). Balances themselves are covered by calc.test.ts. */
 import { describe, expect, it } from 'vitest';
 import { balances, type BalResult } from '../../src/calc/balances';
-import { goalProgress, isTfsa, taxYear, taxYearContributions } from '../../src/calc/tfsa';
+import { contributionsBetween, goalProgress, isTfsa, taxYear, taxYearContributions, tfsaLimit, tfsaYear, tfsaYears } from '../../src/calc/tfsa';
 import { S } from '../../src/core/state';
 import { hasPrivate, referenceBackup } from '../helpers/private';
 import { loadState } from '../helpers/state';
@@ -106,5 +106,49 @@ describe('corrections', () => {
       { d: '2026-08-10', amt: -300, src: 'ledger', ty: 'withdrawal' },
     ].reverse();
     expect(taxYearContributions(res(ev), '2026-10-02')).toBe(2000 - 1000 + 500 + 500);
+  });
+});
+
+describe('earlier tax years', () => {
+  const ev = [
+    { d: '2025-02-28', amt: 400, src: 'budget' },                   // 2024/25
+    { d: '2025-03-01', amt: 250, src: 'budget' },                   // 2025/26
+    { d: '2026-02-28', amt: 250, src: 'budget' },                   // 2025/26, last day
+    { d: '2026-03-28', amt: 250, src: 'budget' },                   // 2026/27, settled
+    { d: '2026-10-28', amt: 250, src: 'budget' },                   // 2026/27, still ahead on 3 Oct
+  ].reverse();
+  it('statutory annual limits by tax year', () => {
+    expect([2015, 2016, 2017, 2019, 2020, 2025, 2026, 2030].map(tfsaLimit)).toEqual([30000, 30000, 33000, 33000, 36000, 36000, 46000, 46000]);
+    expect(tfsaLimit(2014)).toBe(0);
+  });
+  it('the current year counts settled entries against the goal; a past year counts all of it against the limit', () => {
+    const r = res(ev, acc({ goal: 50000, od: '2024-06-01' }), 4400);
+    expect(tfsaYear(r, 2026, '2026-10-03')).toMatchObject({ label: '2026/27', isCurrent: true, amount: 250, target: 50000, limit: 46000, to: '2026-10-03', recordsFrom: null });
+    expect(tfsaYear(r, 2025, '2026-10-03')).toMatchObject({ label: '2025/26', isCurrent: false, amount: 500, target: 36000, limit: 36000, start: '2025-03-01', end: '2026-02-28', recordsFrom: null });
+    expect(tfsaYear(r, 2024, '2026-10-03')).toMatchObject({ amount: 400, recordsFrom: '2024-06-01' });   // records start mid-year
+    expect(tfsaYear(r, 2025, '2026-10-03').pct).toBeCloseTo(500 / 36000, 10);
+  });
+  it('without a goal the current year is measured against the statutory limit', () => {
+    expect(tfsaYear(res(ev, acc({ goal: null, od: '2024-06-01' })), 2026, '2026-10-03').target).toBe(46000);
+  });
+  it('offers the tax years from the first record to now, newest first', () => {
+    expect(tfsaYears(res(ev, acc({ od: '2026-01-01' })), '2026-10-03')).toEqual([2026, 2025]);
+    expect(tfsaYears(res(ev, acc({ od: '2026-03-01' })), '2026-10-03')).toEqual([2026]);
+    expect(tfsaYears(res(ev, acc({ od: '2023-11-01' })), '2026-10-03')).toEqual([2026, 2025, 2024, 2023]);
+  });
+});
+
+describe('a double deposit offset by skipping the next month', () => {
+  // A pays every month; B pays double in month 6 and nothing in month 7. Entries dated the 28th (advance budgeting).
+  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'];
+  const A = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100], Bx = [100, 100, 100, 100, 100, 200, 0, 100, 100, 100];
+  const evs = (xs: number[]) => months.map((m, i) => ({ d: `2030-${m}-28`, amt: xs[i], src: 'budget' })).filter(e => e.amt).reverse();
+  it('both end with the same contributions in the tax year so far, before and after the month\'s planned entry', () => {
+    for (const today of ['2030-10-03', '2030-10-28']) {
+      const a = taxYearContributions(res(evs(A)), today), b = taxYearContributions(res(evs(Bx)), today);
+      expect(a).toBe(b);
+      expect(a).toBe(today === '2030-10-03' ? 700 : 800);
+    }
+    expect(contributionsBetween(res(evs(A)), '2030-01-01', '2030-10-31')).toBe(contributionsBetween(res(evs(Bx)), '2030-01-01', '2030-10-31'));
   });
 });

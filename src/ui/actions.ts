@@ -31,7 +31,7 @@ export const ACT: Record<string, Action> = {
   togglegrp: (d, el) => { const c = S.ui.collapsed || (S.ui.collapsed = {}); c[d.g] = !c[d.g]; (el.parentElement as HTMLElement).dataset.open = c[d.g] ? '0' : '1'; },
   bfilter: d => { S.ui.bfilter = d.v; render(); },
   pbasis: d => { S.ui.people = d.v; render(); },
-  openacc: d => { S.ui.acc = d.id; S.ui.view = 'account'; S.ui.accLimit = 60; S.ui.scrollTop = true; render(); },
+  openacc: d => { S.ui.acc = d.id; S.ui.view = 'account'; S.ui.tfsaYear = null; S.ui.accLimit = 60; S.ui.scrollTop = true; render(); },
   check: d => sheetCheck(d.id),
   ledger: d => sheetLedger(d.id),
   ledgerentry: d => {
@@ -43,6 +43,8 @@ export const ACT: Record<string, Action> = {
   newacc: () => sheetAccount(null),
   transfer: () => sheetTransfer(S.ui.view === 'account' ? S.ui.acc : ''),
   import: d => sheetImport(d.id || (S.ui.view === 'account' ? S.ui.acc : '')),
+  pot: d => { S.ui.pot = d.p || null; render(); },
+  openpot: d => { S.ui.pot = d.p || null; S.ui.view = 'accounts'; S.ui.scrollTop = true; render(); },
   toggleclosed: () => { S.ui.showClosed = !S.ui.showClosed; render(); },
   morehist: () => { S.ui.accLimit = (S.ui.accLimit || 60) + 100; render(); },
   ymode: d => { S.ui.yearMode = d.v; render(); },
@@ -70,6 +72,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   const t: any = e.target;
   if (t.matches('[data-a="yearsel"]')) { S.ui.year = t.value; render(); }
+  if (t.matches('[data-a="tfsayear"]')) { S.ui.tfsaYear = t.value; render(); }
   if (t.matches('[data-a="msfile"]')) msAttach(t.dataset.id, t.files[0]);
   if (t.matches('[data-calc]')) {
     const v = parseFloat(t.value); if (!isFinite(v)) return;

@@ -31,3 +31,14 @@
 .tbl.calc td:nth-child(2) .inp{width:100%}
 .tbl.calc td:last-child{white-space:nowrap;padding-right:0}
 @media (max-width:480px){.tbl.calc td:nth-child(2){width:104px}.tbl.calc td:first-child{padding-right:10px}.tbl.calc td:last-child{white-space:normal;min-width:72px}}
+
+/* TFSA account card: the tax year's contributions lead; the lifetime balance sits beside them */
+.tfsa-head{flex:1 1 320px;min-width:0;max-width:520px}
+.tfsa-head select.inp{width:auto;min-width:0}
+.tfsa-amt{font-family:var(--font-d);font-size:2.2rem;font-weight:750;line-height:1.15;margin:2px 0 4px}
+
+/* Savings pots: filter on Accounts, summary on Home */
+.seg.pots{align-self:flex-start;max-width:100%;overflow-x:auto}
+.pots-home .kpi{font:inherit;color:inherit;text-align:left;cursor:pointer}
+.pots-home .kpi:hover{border-color:var(--brand)}
+.kpis.three{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}

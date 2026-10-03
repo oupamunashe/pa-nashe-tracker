@@ -151,11 +151,14 @@ items: { <itemId>: { n: name, g: groupKey, o: sortOrder, pb?: planBucket, rec?: 
 accounts: { <accId>: { n, t: 'savings'|'goal'|'credit'|'loan'|'bank'|'lent', ow: 'P'|'M'|'J',
                        open: number|null (null = unknown), od: openingDate, bank?, held?, goal?, gd?, limit?, rate?,
                        minp?, due?, bf?: false (budget links do NOT move it – statement-driven), track?: false (bank: no balance),
-                       note?, chk?: 'why the balance must be confirmed', closed?: true } }
+                       note?, chk?: 'why the balance must be confirmed', closed?: true,
+                       pot?: 'short'|'medium'|'long' (savings pot; default from the linked lines' horizon), tfsa?: true } }
 ```
 - `credit` and `loan` are liabilities: their balance is the amount **owing**.
 - `goal` = money earmarked inside other accounts (e.g. Baby Fund, Uber Car Savings). Excluded from the savings total.
 - `lent` = money owed to them (Owner’s Loan to Business).
+- **TFSA** (name contains “TFSA”/“tax-free”, or `tfsa: true`): the account card leads with the contributions in the current SA tax year (1 March – end of February; settled entries up to today) against its goal; earlier tax years can be picked and are measured against that year’s statutory limit (R30,000 from 2015/16, R33,000 from 2017/18, R36,000 from 2020/21, R46,000 from 2026/27). Ledger entries of type `correction` adjust contributions either way (`src/calc/tfsa.ts`).
+- **Savings pots** (`src/calc/pots.ts`): each savings/goal account is Short-term (emergency & liquid), Medium-term (reserves, 1–3 years) or Long-term (investments, 10 years+) – by `pot`, else from the catalog groups of the lines linked to it (`lt` → long, `it` → medium, otherwise short). A pot's total adds its savings accounts (confirmed balances); goals in it are shown separately, never added twice. Filter on Accounts, summary on Home.
 
 ### 3.4 `months/<YYYY-MM>`
 ```
