@@ -2,7 +2,8 @@
    A TFSA's goal (the annual contribution limit) is measured against what went in during the active tax year,
    1 March to 28/29 February – not the lifetime balance. The balance itself is unchanged (see balances.ts).
    Counted as a contribution: money in (budget-linked payments, transfers, deposits). Not counted: growth
-   (interest), balance confirmations, and withdrawals – a withdrawal doesn't give back contribution room. */
+   (interest), balance confirmations, and withdrawals – a withdrawal doesn't give back contribution room.
+   A ledger entry of type 'correction' fixes a wrongly recorded contribution and counts either way (+ or −). */
 import { r2, sum, todayISO } from '../core/format';
 import type { Account } from '../core/types';
 import type { BalResult } from './balances';
@@ -21,7 +22,7 @@ export function taxYear(d: string) {
 /** Contributions to an account within the tax year containing `today`. */
 export function taxYearContributions(r: BalResult, today = todayISO()) {
   const { start, next } = taxYear(today);
-  return r2(sum(r.ev.filter(e => (e.d || '') >= start && (e.d || '') < next && e.ty !== 'check' && e.ty !== 'interest' && e.amt > 0), e => e.amt));
+  return r2(sum(r.ev.filter(e => (e.d || '') >= start && (e.d || '') < next && e.ty !== 'check' && e.ty !== 'interest' && (e.amt > 0 || e.ty === 'correction')), e => e.amt));
 }
 
 /** What a goal bar measures: tax-year contributions for a TFSA, otherwise the balance (as in the prototype). */

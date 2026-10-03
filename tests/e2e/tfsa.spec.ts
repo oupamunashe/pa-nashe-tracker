@@ -38,3 +38,20 @@ test('reference data: TFSA Munny', async ({ page }) => {
   await expect(page.locator('main .row.between.small b').first()).toHaveText(Math.round(exp / goal * 100) + '%');
   await page.screenshot({ path: 'private/test-results/tfsa-account.png' });
 });
+
+test('synthetic: a correction entered on the account page lowers balance and tax-year contributions', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2030-02-01T10:00:00+02:00'));
+  await page.goto('./?synthetic');
+  await page.waitForFunction(() => document.querySelector('main h1')?.textContent === 'Hi Piepie');
+  await page.evaluate(() => { const p = (window as any).__pn; p.S.ui.acc = 'tfsa_p'; p.S.ui.view = 'account'; p.render(); });
+  await page.click('[data-a="ledger"]');
+  await page.fill('#le-amt', '200');
+  await page.click('#le-dir button[data-v="-1"]');
+  await page.selectOption('#le-ty', 'correction');
+  await page.fill('#le-d', '2030-01-28');
+  await page.fill('#le-ds', 'January contribution was R300, not R500');
+  await page.click('#le-save');
+  await expect(page.locator('main .amt').first()).toHaveText('R400.00');
+  await expect(page.getByText('R300.00 contributed in the 2029/30 tax year', { exact: false })).toBeVisible();
+  await expect(page.getByText('January contribution was R300, not R500')).toBeVisible();
+});

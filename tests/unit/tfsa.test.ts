@@ -87,3 +87,16 @@ describe.skipIf(!hasPrivate)('reference data: TFSA Piepie and TFSA Munny', () =>
     expect(combined).toBeCloseTo(linkedTotal, 2);                // both accounts together = everything paid in this tax year
   });
 });
+
+describe('corrections', () => {
+  it('a correction entry adjusts contributions in either direction; a withdrawal does not', () => {
+    const ev = [
+      { d: '2026-06-28', amt: 2000, src: 'budget' },
+      { d: '2026-06-28', amt: -1000, src: 'ledger', ty: 'correction' },   // June was really half
+      { d: '2026-07-28', amt: 500, src: 'budget' },
+      { d: '2026-07-28', amt: 500, src: 'ledger', ty: 'correction' },     // July was really double
+      { d: '2026-08-10', amt: -300, src: 'ledger', ty: 'withdrawal' },
+    ].reverse();
+    expect(taxYearContributions(res(ev), '2026-10-02')).toBe(2000 - 1000 + 500 + 500);
+  });
+});

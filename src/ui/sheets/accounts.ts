@@ -15,7 +15,7 @@ export function sheetLedger(accId, entry?) {
     title: (entry ? 'Edit entry · ' : 'Add entry · ') + a.n,
     body: `<div class="amtbox"><span>R</span><input id="le-amt" inputmode="decimal" placeholder="0.00" value="${e.amt !== undefined ? Math.abs(e.amt) : ''}" autofocus></div>
       <div class="field"><span class="lab">Direction</span><div class="seg" id="le-dir"><button type="button" data-v="1" aria-pressed="${dirIn}">${liab ? 'Owing goes up' : 'Money in'}</button><button type="button" data-v="-1" aria-pressed="${!dirIn}">${liab ? 'Owing goes down' : 'Money out'}</button></div></div>
-      <div class="f2"><div class="field"><label for="le-ty">Type</label><select id="le-ty" class="inp">${['deposit', 'withdrawal', 'interest', 'fee', 'spend', 'repayment', 'transfer', 'other'].map(t => `<option ${t === e.ty ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div class="f2"><div class="field"><label for="le-ty">Type</label><select id="le-ty" class="inp">${['deposit', 'withdrawal', 'interest', 'fee', 'spend', 'repayment', 'transfer', 'correction', 'other'].map(t => `<option ${t === e.ty ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
         <div class="field"><label for="le-d">Date</label><input id="le-d" class="inp" type="date" value="${e.d || todayISO()}"></div></div>
       <div class="field"><label for="le-ds">Description</label><input id="le-ds" class="inp" value="${esc(e.ds || '')}"></div>
       <p class="small muted">Use this for things the monthly budget doesn’t see: interest, bank fees, money moved in or out outside the budget.</p>`,
