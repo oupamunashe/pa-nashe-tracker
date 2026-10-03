@@ -2,19 +2,20 @@
 
 Household budget, savings and spending tracker for Piepie and Munny – a web app you can install on your phone.
 
-**Building it:** see `PROMPT.md` (setup + the prompt for Claude Code).
+**Live:** https://oupamunashe.github.io/pa-nashe-tracker/ · **Install on your phone:** [docs/INSTALL.md](docs/INSTALL.md)
+
+Vite + TypeScript (no framework) · Supabase (Postgres JSON documents, Realtime, Auth, Storage) · GitHub Pages via GitHub Actions · installable PWA with an offline outbox. A faithful port of the prototype in `prototype/`.
 
 | Path | What it is |
 |---|---|
-| `PROMPT.md` | One-time setup (Supabase, GitHub) and the kickoff prompt |
-| `CLAUDE.md` | Rules and map for Claude Code |
-| `docs/SPEC.md` | Full specification of the app |
-| `supabase/` | Database setup (`migrations/0001_init.sql`) and the members template |
-| `prototype/` | The working prototype the app is ported from, plus its test harness |
-| `private/` | Your real data, PDFs, statements, screenshots and acceptance numbers – **git-ignored, never uploaded** |
+| `src/core`, `src/calc` | State, formatting and every calculation, moved verbatim from the prototype |
+| `src/data` | Storage adapters (Supabase, in-memory), deep merge, IndexedDB cache and offline outbox |
+| `src/auth`, `src/ui`, `src/io` | Sign-in, screens and sheets, statement import, Excel export and backups |
+| `tests/` | Vitest (calculations, merge, adapters) and Playwright (acceptance flows, screens, offline) |
+| `scripts/` | `seed` (load a backup into Supabase), `check` (project health), `icons` |
+| `supabase/` | Database schema (`migrations/0001_init.sql`) and the members template |
+| `docs/` | `SPEC.md` (full specification), `INSTALL.md` (phone install guide) |
+| `prototype/` | The working prototype the app was ported from |
+| `private/` | Real data, PDFs, statements, screenshots and acceptance numbers – **git-ignored, never uploaded** |
 
-Running the prototype’s own checks (optional):
-```bash
-pip3 install playwright openpyxl && python3 -m playwright install chromium
-python3 private/tests/test_flows.py
-```
+Commands are listed in `CLAUDE.md`. Every push to `main` is tested and deployed by `.github/workflows/deploy.yml`.
