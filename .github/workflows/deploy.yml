@@ -49,6 +49,15 @@ jobs:
             exit 1
           fi
           case "$VITE_SUPABASE_URL" in https://*.supabase.co|https://*.supabase.co/) ;; *) echo "::error::VITE_SUPABASE_URL should look like https://<project>.supabase.co"; exit 1;; esac
+          # The anon key names its project: catch a URL and key from different projects (or a typo in the URL).
+          node -e '
+            const url = process.env.VITE_SUPABASE_URL, key = process.env.VITE_SUPABASE_ANON_KEY;
+            const host = new URL(url).hostname.split(".")[0];
+            const parts = key.split(".");
+            if (parts.length !== 3) process.exit(0);           // newer publishable keys carry no project name
+            const ref = JSON.parse(Buffer.from(parts[1], "base64url")).ref;
+            if (ref && ref !== host) { console.log(`::error::VITE_SUPABASE_URL points at project "${host}" but the anon key belongs to "${ref}". Fix the URL secret.`); process.exit(1); }
+            console.log("Supabase URL and anon key belong to the same project.");'
 
       - name: Build
         run: npm run build
