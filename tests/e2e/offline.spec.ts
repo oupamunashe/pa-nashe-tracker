@@ -88,6 +88,8 @@ test('offline: capture, reload and sync (production build, service worker)', asy
   // 4. back online: the queued change is sent and the chip clears
   sb.offline = false; await ctx.setOffline(false);
   await expect(chip).toBeEmpty({ timeout: 15000 });
+  // the chip clears as soon as sending starts, so wait for the request itself (slower CI machines)
+  await expect.poll(() => sb.rpcs.filter(x => x.name === 'doc_merge').length, { timeout: 15000 }).toBe(1);
   const merges = sb.rpcs.filter(x => x.name === 'doc_merge');
   expect(merges).toHaveLength(1);
   const sent: any = Object.values(merges[0].body.p_patch.txns)[0];
