@@ -27,6 +27,14 @@ export function lineRow(l, k) {
     <div class="num only-wide ${left < -0.004 ? 'neg' : 'muted'}">${l.b || l.act ? fmt(left) : ''}</div>
   </div>`;
 }
+/** “Against your plan”: savings are on track at or above their target share, spending at or below it. */
+export function planOnTrack(c: { save?: boolean; actPct: number; planPct: number }) {
+  return c.save ? c.actPct >= c.planPct : c.actPct <= c.planPct;
+}
+/** Bar colour for a plan category: red when off track; green for savings and teal for spending when on track. */
+export function planBarColor(c: { save?: boolean; actPct: number; planPct: number }) {
+  return !planOnTrack(c) ? 'var(--bad)' : c.save ? 'var(--good)' : 'var(--brand)';
+}
 export function hbar(actPct, planPct, color = 'var(--brand)') {
   return `<div class="bar"><span style="width:${Math.max(0, Math.min(100, actPct * 100))}%;background:${color}"></span>${planPct ? `<i style="left:${Math.min(99.5, planPct * 100)}%"></i>` : ''}</div>`;
 }

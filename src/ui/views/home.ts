@@ -6,7 +6,7 @@ import { planCalc } from '../../calc/plan';
 import { GMAP, MONTHS } from '../../core/constants';
 import { esc, fmt, fmt0, mName, pct, sum } from '../../core/format';
 import { main, pname, S } from '../../core/state';
-import { allocChips, hbar, txnLi } from '../parts';
+import { allocChips, hbar, planBarColor, planOnTrack, txnLi } from '../parts';
 
 export function viewHome(k) {
   const mc = monthCalc(k), T = mc.T, pa = peopleCalc(k, 'a');
@@ -50,8 +50,8 @@ export function viewHome(k) {
         <div class="seg">${['1', '2', '3'].map(s => `<button data-a="scen" data-s="${s}" aria-pressed="${s === sid}">${s}</button>`).join('')}</div></div>
       <p class="small muted" style="margin:-4px 0 10px">Scenario ${sid}: ${esc(main().scen?.[sid]?.name || '')}. The tick shows the target share of earned income.</p>
       ${pl.cats.map(c => `<div style="margin-bottom:10px"><div class="row between small"><span>${esc(c.n)}</span>
-        <span class="amt"><b class="${c.save ? (c.actPct >= c.planPct ? 'pos' : 'neg') : (c.actPct <= c.planPct ? 'pos' : 'neg')}">${pct(c.actPct)}</b> <span class="muted">of ${pct(c.planPct)}</span></span></div>
-        ${hbar(c.actPct, c.planPct, c.save ? 'var(--good)' : (c.actPct > c.planPct ? 'var(--bad)' : 'var(--brand)'))}</div>`).join('')}
+        <span class="amt"><b class="${planOnTrack(c) ? 'pos' : 'neg'}">${pct(c.actPct)}</b> <span class="muted">of ${pct(c.planPct)}</span></span></div>
+        ${hbar(c.actPct, c.planPct, planBarColor(c))}</div>`).join('')}
       <div class="row between small" style="margin-top:12px"><span class="muted">Net savings rate (after drawdowns)</span><b class="${pl.netRate >= (pl.savePlan / (pl.base || 1)) ? 'pos' : 'neg'}">${pct(pl.netRate, 1)}</b></div>
     </section>
   </div>
