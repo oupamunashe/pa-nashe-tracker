@@ -4,13 +4,25 @@ import { createClient, type Session, type SupabaseClient } from '@supabase/supab
 import { lsGet, lsSet } from '../core/state';
 import type { Who } from '../core/types';
 
+/** Database requests give up after 20 s (weak signal, captive Wi-Fi) so the outbox treats them as offline and
+    retries, instead of the whole queue waiting on one request that never answers. Uploads keep no limit. */
+export const DB_TIMEOUT_MS = 20_000;
+export const timedFetch: typeof fetch = (input, init: RequestInit = {}) => {
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+  if (init.signal || !/\/rest\/v1\//.test(url) || typeof AbortSignal.timeout !== 'function') return fetch(input, init);
+  return fetch(input, { ...init, signal: AbortSignal.timeout(DB_TIMEOUT_MS) });
+};
+
 let client: SupabaseClient | null = null;
 export function supabase(): SupabaseClient {
   if (client) return client;
   const url = import.meta.env.VITE_SUPABASE_URL as string | undefined, key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
   if (!url || !key) throw new Error('This build has no Supabase settings (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).');
   // implicit flow: a reset link opened on another device than the one that asked for it still works
-  client = createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' } });
+  client = createClient(url, key, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' },
+    global: { fetch: timedFetch },
+  });
   return client;
 }
 

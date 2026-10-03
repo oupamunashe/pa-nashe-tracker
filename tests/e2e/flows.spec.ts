@@ -118,6 +118,28 @@ test.describe.serial('acceptance flows', () => {
     expect(await ev<number>(page, "p.monthCalc('2026-10').T.a.auto")).toBeGreaterThanOrEqual(412.3);
   });
 
+  test('9b import: learns a rule, one write per month, PDF message (SPEC §5.8)', async () => {
+    const csv = priv('test-results', 'rule_stmt.csv');
+    writeFileSync(csv, `"Value Date","Value Time","Type","Description","Beneficiary or Cardholder","Amount"\n2026-09-20,10:00:00,"Card","ZEBRA BAKERY CAPE TOWN","",-55.00\n2026-10-01,10:00:00,"Card","ZEBRA BAKERY CAPE TOWN","",-45.00\n`);
+    await ev(page, "(p.closeAll(),p.sheetImport('d_cc'))");
+    await page.setInputFiles('#im-file', csv);
+    await expect(page.locator('#im-sum')).toContainText('2 to budget');
+    for (const i of [0, 1]) await page.locator(`.imp-row[data-r="${i}"] select[data-f="it"]`).selectOption('groceries');
+    const w0 = await ev<number>(page, 'p.db.writes.length');
+    await page.click('#im-go');
+    // learned from the first two words. (Prototype behaviour kept: two rows teaching the same rule in one
+    // import add it twice – harmless, the first match wins. Listed under “Proposed changes”.)
+    await expect.poll(() => ev<number>(page, "(p.S.cfg.main.rules||[]).filter(r=>r[0]==='ZEBRA BAKERY'&&r[1]==='groceries').length")).toBeGreaterThan(0);
+    const writes = (await ev<any[]>(page, 'p.db.writes')).slice(w0).map(w => w[1]);
+    expect(writes.filter(p => p.startsWith('months/')).sort()).toEqual(['months/2026-09', 'months/2026-10']);   // one per month
+    expect(writes.filter(p => p === 'config/main')).toHaveLength(1);                                            // plus the learned rule
+    // PDF statements: the prototype's message, nothing read
+    await ev(page, "(p.closeAll(),p.sheetImport('d_cc'))");
+    await page.setInputFiles('#im-file', { name: 'statement.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4') });
+    await expect(page.locator('#im-out .notice')).toContainText('PDF statements arrive in Prototype 2');
+    await ev(page, 'p.closeAll()');
+  });
+
   test('10 new milestone in rand and US dollars', async () => {
     const name = quoted(10), rate = flowLine(10).match(/R([\d.]+)\/US\$/)![1];
     await ev(page, "(p.S.ui.view='milestones',p.render())");
@@ -153,6 +175,19 @@ test.describe.serial('acceptance flows', () => {
     expect(row5.slice(1, 4)).toEqual([sal.n, sal.b, sal.a]);
     expect(row5[6]).toBe(sal.who);
     expect(row5[7]).toBe(sal.b);
+  });
+
+  test('11b JSON backup has the backup shape and holds everything (SPEC §5.10)', async () => {
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-a="backup"]')]);
+    expect(dl.suggestedFilename()).toMatch(/^Pa-Nashe Tracker backup \d{4}-\d{2}-\d{2}\.json$/);
+    const b = JSON.parse(readFileSync(await dl.path(), 'utf8'));
+    expect(Object.keys(b)).toEqual(['exported', 'config', 'months', 'milestones']);
+    expect(Object.keys(b)).toEqual(Object.keys(referenceBackup()));
+    const store = await ev<any>(page, 'p.db.store');
+    for (const [k, v] of Object.entries<any>(b.config)) expect(v).toEqual(store['config/' + k]);
+    for (const [k, v] of Object.entries<any>(b.months)) expect(v).toEqual(store['months/' + k]);
+    for (const [k, v] of Object.entries<any>(b.milestones)) expect(v).toEqual(store['milestones/' + k]);
+    expect(Object.keys(b.months).length).toBe(Object.keys(store).filter(k => k.startsWith('months/')).length);
   });
 
   test('12 personFromText in the app', async () => {

@@ -20,3 +20,4 @@ __pycache__/
 .claude/settings.local.json
 # the original package contains private/
 *.zip
+dist-e2e/

@@ -12,5 +12,7 @@
 .signin #si-msg:empty{display:none}
 
 /* “Offline – N changes waiting” chip in the top bar */
-.netchip{white-space:nowrap}
+.netchip{min-width:0;flex:0 1 auto}
 .netchip:empty{display:none}
+.topbar .who{flex:none}
+@media (max-width:440px){.netchip .chip{white-space:normal;line-height:1.15;padding:3px 8px}}

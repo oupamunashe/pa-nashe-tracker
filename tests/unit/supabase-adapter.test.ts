@@ -147,3 +147,20 @@ describe('SupabaseAdapter', () => {
     expect(isTransient({ message: 'violates row-level security', code: '42501' }, 403)).toBe(false);
   });
 });
+
+describe('request timeout', () => {
+  it('database requests are aborted after the limit and count as temporary', async () => {
+    const { timedFetch, DB_TIMEOUT_MS } = await import('../../src/auth/auth');
+    expect(DB_TIMEOUT_MS).toBe(20_000);
+    const seen: any[] = [];
+    const real = globalThis.fetch;
+    globalThis.fetch = (async (_i: any, init: any) => { seen.push(init?.signal); return new Response('[]'); }) as any;
+    try {
+      await timedFetch('https://x.supabase.co/rest/v1/docs?select=id');
+      await timedFetch('https://x.supabase.co/storage/v1/object/files/a.png', { method: 'POST' });
+    } finally { globalThis.fetch = real; }
+    expect(seen[0]).toBeInstanceOf(AbortSignal);      // database: limited
+    expect(seen[1]).toBeUndefined();                  // uploads: no limit
+    expect(isTransient(new DOMException('signal timed out', 'TimeoutError'))).toBe(true);
+  });
+});
