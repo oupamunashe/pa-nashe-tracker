@@ -50,7 +50,10 @@ Stack: Vite + TypeScript (no UI framework) · Supabase (Postgres JSON documents,
 - `npm run seed -- private/data/live-backup-2026-10-02.json` – load a backup into Supabase (asks for confirmation; uploads PDFs; rewrites asset ids)
 - `npm run check` – read-only health check of the Supabase project (sign-up off, members, RLS, counts; prints no emails or figures)
 - `npm run seed -- <backup.json> --yes` – same as above without the question (only when the owners have said so)
-- `npm run build` – production build; deployment happens via GitHub Actions on push to `main`
+- `npm run build` – production build; deployment happens via GitHub Actions on push to `main` (`.github/workflows/deploy.yml`: typecheck, tests, secret check, build, Pages). Live: https://oupamunashe.github.io/pa-nashe-tracker/
+- `npm run build && npm run preview` – the production build locally (service worker, installable) at http://localhost:4173/pa-nashe-tracker/
+- `npm run icons` – regenerate the PWA icons in `public/` from the logo dot
+- Pushing a change to `.github/workflows/` needs a GitHub token with the `workflow` scope
 
 ## Working style
 
