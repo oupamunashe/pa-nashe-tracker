@@ -22,3 +22,12 @@
 .netchip:empty{display:none}
 .topbar .who{flex:none}
 @media (max-width:440px){.netchip .chip{white-space:normal;line-height:1.15;padding:3px 8px}}
+
+/* Plan calculators: labels wrap instead of clipping; inputs and results stay aligned with them */
+.tbl.calc{table-layout:auto}
+.tbl.calc td{vertical-align:middle}
+.tbl.calc td:first-child{position:static;max-width:none;overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:break-word;width:100%;padding-left:0;padding-right:14px;line-height:1.35}
+.tbl.calc td:nth-child(2){width:130px;min-width:96px;padding-inline:4px 10px}
+.tbl.calc td:nth-child(2) .inp{width:100%}
+.tbl.calc td:last-child{white-space:nowrap;padding-right:0}
+@media (max-width:480px){.tbl.calc td:nth-child(2){width:104px}.tbl.calc td:first-child{padding-right:10px}.tbl.calc td:last-child{white-space:normal;min-width:72px}}

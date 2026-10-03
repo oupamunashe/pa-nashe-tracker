@@ -31,7 +31,7 @@ export function viewPlan(k) {
   const standFull = ((+bg.standUsd || 0) * (1 + (+bg.transferPct || 0)) + (+bg.servicesUsd || 0)) * (+bg.fx || 0) * (1 + (+bg.fxBuffer || 0));
   const standDep = (+bg.depositShare || 0) * (+bg.standUsd || 0) * (+bg.fx || 0) * (1 + (+bg.fxBuffer || 0));
   const months = (target, have, per) => per > 0 ? Math.max(0, (target - have) / per).toFixed(1) + ' months' : '–';
-  const inp = (path, v, step = 'any') => `<input class="inp sm num" style="max-width:130px;text-align:right" type="number" step="${step}" inputmode="decimal" data-calc="${path}" value="${v ?? ''}">`;
+  const inp = (path, v, step = 'any') => `<input class="inp sm num" style="text-align:right" type="number" step="${step}" inputmode="decimal" data-calc="${path}" value="${v ?? ''}">`;
   const crow = (label, input, out) => `<tr><td>${label}</td><td>${input || ''}</td><td>${out ?? ''}</td></tr>`;
   return `<div class="stack">
     <div class="pagehead"><div><h1>Plan</h1><p class="muted">How ${mName(k)} compares with your three scenarios. Scenario 1 is the everyday yardstick.</p></div>
@@ -57,7 +57,7 @@ export function viewPlan(k) {
       <p class="small muted" style="padding:0 14px">Edit a target % to change this scenario. Fixed rand amounts (sprint project, maxed TFSAs) can be changed in the calculators below.</p>
     </section>
     <div class="grid2">
-      <section class="panel"><h2>Emergency fund</h2><table class="tbl" style="margin-top:8px"><tbody>
+      <section class="panel"><h2>Emergency fund</h2><table class="tbl calc" style="margin-top:8px"><tbody>
         ${crow('Essential monthly costs (Scenario 1 plan)', '', fmt0(essentials))}
         ${crow('First milestone (months)', inp('emergency.m1', e.m1), fmt0(essentials * (+e.m1 || 0)))}
         ${crow('Full target (months)', inp('emergency.m2', e.m2), fmt0(essentials * (+e.m2 || 0)))}
@@ -65,7 +65,7 @@ export function viewPlan(k) {
         ${crow('Time to first milestone', '', months(essentials * (+e.m1 || 0), B.g_emergency?.bal || 0, emerContrib))}
         ${crow('Repayment freed when Money Savers ends', inp('emergency.stepUp', e.stepUp), months(essentials * (+e.m1 || 0), B.g_emergency?.bal || 0, emerContrib + (+e.stepUp || 0)))}
       </tbody></table></section>
-      <section class="panel"><h2>La Vie vacancy reserve</h2><table class="tbl" style="margin-top:8px"><tbody>
+      <section class="panel"><h2>La Vie vacancy reserve</h2><table class="tbl calc" style="margin-top:8px"><tbody>
         ${crow('Rent (per month)', inp('lavie.rent', lv.rent), '')}
         ${crow('Levies + bond + cover if vacant', `${inp('lavie.levies', lv.levies)}`, fmt0(lvCarry))}
         ${crow('Bond instalment', inp('lavie.bond', lv.bond), '')}
@@ -76,7 +76,7 @@ export function viewPlan(k) {
         ${crow('Monthly contribution (from emergency + extra bond + escalation)', inp('lavie.fromEmergency', lv.fromEmergency), fmt0(lvMonthly))}
         ${crow('Time to target (after the seed lump sum)', inp('lavie.seed', lv.seed), months(lvTarget - (+lv.seed || 0), lvBal, lvMonthly))}
       </tbody></table></section>
-      <section class="panel"><h2>Baby Fund</h2><table class="tbl" style="margin-top:8px"><tbody>
+      <section class="panel"><h2>Baby Fund</h2><table class="tbl calc" style="margin-top:8px"><tbody>
         ${crow('Months until the baby arrives', inp('baby.monthsLeft', bb.monthsLeft), '')}
         ${crow('Birth – hospital & specialists', inp('baby.birth', bb.birth), '')}
         ${crow('Essentials & nursery', inp('baby.essentials', bb.essentials), '')}
@@ -87,7 +87,7 @@ export function viewPlan(k) {
         ${crow('Needed per month to be ready', '', fmt0((+bb.monthsLeft || 0) ? Math.max(0, babyTarget - babyBal) / bb.monthsLeft : 0))}
         ${crow('Shortfall at birth at planned contribution', inp('baby.planned', bb.planned), `<span class="neg">${fmt0(Math.max(0, babyTarget - babyBal - (+bb.planned || 0) * (+bb.monthsLeft || 0)))}</span>`)}
       </tbody></table></section>
-      <section class="panel"><h2>Big purchase</h2><table class="tbl" style="margin-top:8px"><tbody>
+      <section class="panel"><h2>Big purchase</h2><table class="tbl calc" style="margin-top:8px"><tbody>
         ${crow('Everyday contribution (Scenario 1)', inp('big.everyday', bg.everyday), '')}
         ${crow('Car price', inp('big.carPrice', bg.carPrice), '')}
         ${crow('Deposit share (0.2 = 20%)', inp('big.depositPct', bg.depositPct, '0.01'), '')}
