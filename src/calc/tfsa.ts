@@ -3,7 +3,9 @@
    1 March to 28/29 February – not the lifetime balance. The balance itself is unchanged (see balances.ts).
    Counted as a contribution: money in (budget-linked payments, transfers, deposits). Not counted: growth
    (interest), balance confirmations, and withdrawals – a withdrawal doesn't give back contribution room.
-   A ledger entry of type 'correction' fixes a wrongly recorded contribution and counts either way (+ or −). */
+   A ledger entry of type 'correction' fixes a wrongly recorded contribution and counts either way (+ or −).
+   Only settled entries count (dated up to today): the budget runs a month ahead, so a month's planned
+   contribution is dated the 28th and only counts from that day. */
 import { r2, sum, todayISO } from '../core/format';
 import type { Account } from '../core/types';
 import type { BalResult } from './balances';
@@ -19,10 +21,10 @@ export function taxYear(d: string) {
   return { start: `${s}-03-01`, next: `${s + 1}-03-01`, end: `${s + 1}-02-${leap ? '29' : '28'}`, label: `${s}/${String(s + 1).slice(2)}` };
 }
 
-/** Contributions to an account within the tax year containing `today`. */
+/** Settled contributions to an account in the tax year containing `today`: from 1 March up to and including today. */
 export function taxYearContributions(r: BalResult, today = todayISO()) {
-  const { start, next } = taxYear(today);
-  return r2(sum(r.ev.filter(e => (e.d || '') >= start && (e.d || '') < next && e.ty !== 'check' && e.ty !== 'interest' && (e.amt > 0 || e.ty === 'correction')), e => e.amt));
+  const { start } = taxYear(today);
+  return r2(sum(r.ev.filter(e => (e.d || '') >= start && (e.d || '') <= today && e.ty !== 'check' && e.ty !== 'interest' && (e.amt > 0 || e.ty === 'correction')), e => e.amt));
 }
 
 /** What a goal bar measures: tax-year contributions for a TFSA, otherwise the balance (as in the prototype). */

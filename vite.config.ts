@@ -32,14 +32,14 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pm-mark.png'],
       manifest: {
         name: 'Pa-Nashe Tracker',
         short_name: 'Pa-Nashe',
         description: 'Household budget, savings and spending tracker for Piepie and Munny.',
         lang: 'en-ZA',
-        theme_color: '#1F6B5C',
-        background_color: '#EEF2EF',
+        theme_color: '#1C1E26',
+        background_color: '#1C1E26',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/pa-nashe-tracker/',

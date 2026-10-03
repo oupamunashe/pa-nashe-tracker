@@ -61,7 +61,7 @@ test('offline: capture, reload and sync (production build, service worker)', asy
   expect(await page.locator('link[rel="manifest"]').count()).toBe(1);
   await expect(chip).toBeEmpty();
   const manifest = await (await page.request.get(APP + 'manifest.webmanifest')).json();
-  expect(manifest).toMatchObject({ name: 'Pa-Nashe Tracker', short_name: 'Pa-Nashe', theme_color: '#1F6B5C', start_url: '/pa-nashe-tracker/', scope: '/pa-nashe-tracker/', display: 'standalone' });
+  expect(manifest).toMatchObject({ name: 'Pa-Nashe Tracker', short_name: 'Pa-Nashe', theme_color: '#1C1E26', start_url: '/pa-nashe-tracker/', scope: '/pa-nashe-tracker/', display: 'standalone' });
 
   // 2. offline: capture a spend – shown at once, counted in the chip
   sb.offline = true; await ctx.setOffline(true);

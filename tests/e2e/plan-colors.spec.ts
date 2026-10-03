@@ -1,10 +1,10 @@
 /* Home → “Against your plan” as rendered: every bar's colour and percentage colour follow the rule –
-   savings red below target, green at/above; spending red above target, teal at/below. */
+   savings red below target, green at/above; spending red above target, green at/below – one green, one red. */
 import { expect, test, type Page } from '@playwright/test';
 import { hasPrivate } from '../helpers/private';
 import { openDemo } from './demo';
 
-const RED = 'var(--bad)', GREEN = 'var(--good)', TEAL = 'var(--brand)';
+const RED = 'var(--bad)', GREEN = 'var(--good)';
 
 /** Each category row of the card as drawn, next to the figures planCalc gives for it. */
 async function card(page: Page) {
@@ -24,7 +24,7 @@ async function card(page: Page) {
 }
 const expected = (c: { save: boolean; act: number; plan: number }) => {
   const ok = c.save ? c.act >= c.plan : c.act <= c.plan;
-  return { bar: !ok ? RED : c.save ? GREEN : TEAL, text: ok ? 'pos' : 'neg' };
+  return { bar: ok ? GREEN : RED, text: ok ? 'pos' : 'neg' };   // one green, one red
 };
 function assertRule(rows: Awaited<ReturnType<typeof card>>) {
   expect(rows).toHaveLength(6);
@@ -41,7 +41,7 @@ test('synthetic data: savings and spending bars follow their thresholds', async 
   assertRule(rows);
   const savings = rows.find(r => r.save)!, house = rows.find(r => r.name === 'House Bills & Utilities')!;
   expect(savings.bar).toBe(GREEN);                 // 10% of a 10% target: on target
-  expect(house.bar).toBe(TEAL);                    // 40% of 40%: at target counts as within plan
+  expect(house.bar).toBe(GREEN);                   // 40% of 40%: at target counts as within plan
 
   // raise the savings target and lower the house target: both go red
   await page.evaluate(() => (window as any).__pn.db.doc('config/main').update({ scen: { '1': { b: { retire: [0.25, 0], sultana: [0.3, 0] } } } }));

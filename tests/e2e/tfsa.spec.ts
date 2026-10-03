@@ -30,7 +30,7 @@ test('reference data: TFSA Munny', async ({ page }) => {
   // expected contributions computed straight from the backup: TFSA-linked entries since 1 March, times the share
   const b = referenceBackup(); let exp = 0;
   for (const m of Object.values<any>(b.months)) for (const t of Object.values<any>(m.txns || {}))
-    if (t && t.d >= '2026-03-01' && t.d < '2027-03-01') for (const f of b.config.catalog.items[t.it]?.fl || []) if (f.a === 'tfsa_m') exp += f.s * t.amt;
+    if (t && t.d >= '2026-03-01' && t.d <= '2026-10-02') for (const f of b.config.catalog.items[t.it]?.fl || []) if (f.a === 'tfsa_m') exp += f.s * t.amt;
   await page.evaluate(() => { const p = (window as any).__pn; p.S.ui.acc = 'tfsa_m'; p.S.ui.view = 'account'; p.render(); });
   await expect(page.locator('main .amt').first()).toHaveText(fmt(baseline().bal.tfsa_m.bal));   // lifetime balance unchanged
   await expect(page.getByText(`${fmt(exp)} contributed in the 2026/27 tax year`, { exact: false })).toBeVisible();

@@ -29,7 +29,7 @@ Stack: Vite + TypeScript (no UI framework) · Supabase (Postgres JSON documents,
 5. **Secrets.** Only the Supabase URL and anon key reach the browser (as `VITE_` variables). The service-role key is for the local seed script only, from `.env.local`.
 6. **Only the two members** can read or write. Row-level security enforces it in the database; the UI also blocks non-members.
 7. **Money**: numbers in rand, `r2()` before every write, `fmt()` for display (`R1,234.56`, negatives `–R1,234.56`).
-8. **People colours**: Piepie lavender `#dfc5fe` (text on it `#4B2A78`), Munny light brown `#ae8774` (text on it `#3B261C`). Buttons say only “Piepie” and “Munny”.
+8. **People colours**: Piepie lavender `#dfc5fe` (text on it `#4B2A78`), Munny light brown `#ae8774` (text on it `#3B261C`) – keep them in every theme. Buttons say only “Piepie” and “Munny”. The rest of the palette (dark-first, `#1C1E26` / `#ADC6FF`) is in SPEC §7.
 9. **Browser storage**: `localStorage` only for small per-device preferences, always in try/catch; IndexedDB for the offline cache and outbox.
 10. **Copy**: reuse the prototype’s wording – plain, sentence case, from the users’ point of view.
 
@@ -52,7 +52,7 @@ Stack: Vite + TypeScript (no UI framework) · Supabase (Postgres JSON documents,
 - `npm run seed -- <backup.json> --yes` – same as above without the question (only when the owners have said so)
 - `npm run build` – production build; deployment happens via GitHub Actions on push to `main` (`.github/workflows/deploy.yml`: typecheck, tests, secret check, build, Pages). Live: https://oupamunashe.github.io/pa-nashe-tracker/
 - `npm run build && npm run preview` – the production build locally (service worker, installable) at http://localhost:4173/pa-nashe-tracker/
-- `npm run icons` – regenerate the PWA icons in `public/` from the logo dot
+- `npm run icons` – regenerate the logo mark and PWA icons in `public/` from `Linktree Art.png` (project root, git-ignored – a personal photo; only the white mark is published)
 - Pushing a change to `.github/workflows/` needs a GitHub token with the `workflow` scope
 
 ## Working style

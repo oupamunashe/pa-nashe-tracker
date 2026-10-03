@@ -19,7 +19,7 @@ export function sheetWho() {
 
 export function sheetSettings() {
   const p: any = main().people || {};
-  const theme = document.documentElement.dataset.theme || 'auto';
+  const theme = document.documentElement.dataset.theme || 'dark';   // no choice saved = the default dark look
   openSheet({
     title: 'Settings',
     body: `<h3 style="margin-bottom:8px">Names</h3>
@@ -36,7 +36,7 @@ export function sheetSettings() {
     onMount: el => {
       (el.querySelector('#st-who') as HTMLElement).onclick = () => { closeSheet(); sheetWho(); };
       el.querySelectorAll<HTMLElement>('#st-theme button').forEach(b => b.onclick = () => {
-        const v = b.dataset.v as string; if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
+        const v = b.dataset.v as string; document.documentElement.dataset.theme = v;   // 'auto' follows the phone (styles/app.css)
         lsSet('pn_theme', v);
         el.querySelectorAll('#st-theme button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
       });

@@ -19,6 +19,7 @@ const STATES: [string, string][] = [
   ['sheet-who', 'p.closeAll();p.sheetWho()'],
   ['sheet-trend', "p.closeAll();p.S.ui.view='year';p.render();p.sheetTrend('groceries')"],
   ['home-dark', "p.closeAll();document.documentElement.dataset.theme='dark';p.S.ui.view='home';p.render()"],
+  ['home-light', "p.closeAll();document.documentElement.dataset.theme='light';p.S.ui.view='home';p.render()"],
 ];
 
 test.describe('screens', () => {
@@ -36,7 +37,7 @@ test.describe('screens', () => {
       for (const [state, js] of STATES) {
         await page.evaluate(`(()=>{const p=window.__pn;${js}})()`);
         await page.waitForTimeout(250);
-        await page.screenshot({ path: `${OUT}/${name}-${state}.png`, fullPage: name === 'phone' && !state.startsWith('sheet') && state !== 'account' && state !== 'milestone' && state !== 'home-dark', animations: 'disabled' });
+        await page.screenshot({ path: `${OUT}/${name}-${state}.png`, fullPage: name === 'phone' && !state.startsWith('sheet') && state !== 'account' && state !== 'milestone' && !state.startsWith('home-'), animations: 'disabled' });
       }
       expect(errors).toEqual([]);
     });

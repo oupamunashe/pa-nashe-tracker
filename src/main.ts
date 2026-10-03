@@ -97,6 +97,7 @@ async function startApp() {
   else if (!entered) showSignIn();
 }
 
-const th = lsGet('pn_theme'); if (th && th !== 'auto') document.documentElement.dataset.theme = th;
+const th = lsGet('pn_theme'); if (th) document.documentElement.dataset.theme = th;   // none saved: dark
+document.documentElement.style.setProperty('--logo', `url(${import.meta.env.BASE_URL}pm-mark.png)`);
 document.body.innerHTML = '<main id="main"><div class="loading"><div><div class="spin"></div>Loading your tracker…</div></div></main>';
 if (import.meta.env.MODE === 'demo') startDemo(); else startApp();

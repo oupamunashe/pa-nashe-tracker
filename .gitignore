@@ -21,3 +21,5 @@ __pycache__/
 # the original package contains private/
 *.zip
 dist-e2e/
+# logo source artwork – a personal photo; only the extracted mark is published
+Linktree Art.png

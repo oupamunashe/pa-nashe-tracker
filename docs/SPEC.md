@@ -278,17 +278,19 @@ Navigation: phone – top bar (logo dot, month switcher, “who” button) + bot
 
 ---
 
-## 7. Design system (`app.css`)
+## 7. Design system (`src/styles/app.css`)
 
-- **Fonts**: Bricolage Grotesque (headings, figures; 500/650/750) and Figtree (body; 400–700). Tabular figures for amounts.
-- **Light tokens**: bg `#EEF2EF`, surface `#FFFFFF`, surface2 `#F6F8F6`, ink `#16302A`, muted `#5B6F69`, faint `#8A9A95`, line `#D6DFDA`, brand (fynbos green) `#1F6B5C`, brand-soft `#DCEBE6`, good `#2E7A4E`, bad `#B4432F`, warn `#9A6A12`, joint `#4F6D7A`.
-- **People**: Piepie `#dfc5fe` / ink `#4B2A78` / soft `#F1E6FF`; Munny `#ae8774` / ink `#3B261C` / soft `#EADFD9`. Used on chips, avatars, 6 px top border of person cards, hero split bar, logo dot (conic half/half).
-- **Dark mode** via `prefers-color-scheme` and `data-theme="dark|light"` override (tokens in `app.css`).
+Updated after the port (October 2026): dark-first look, Century Gothic, PM logo. The prototype's original tokens are in `prototype/src/app.css`.
+
+- **Fonts**: one family for headings and body – `'Century Gothic', CenturyGothic, 'Urbanist', AppleGothic, sans-serif`. Century Gothic is used where installed; elsewhere (phones, most Macs) the self-hosted look-alike Urbanist (SIL OFL). Tabular figures for amounts.
+- **Dark tokens (default)**: bg `#1C1E26`, surface `#242732`, surface2 `#2B2F3C`, ink `#E7E9F0`, muted `#A5AABA`, faint `#7F8495`, line `#363A48`, accent (brand) `#ADC6FF` with text `#1C1E26` on it, brand-soft `#2E3752`, good `#6CC394`, bad `#EE8B76`, warn `#E3B45A`, joint `#9DB8C4`.
+- **Light tokens** (Settings → Appearance → Light, or Match device on a light-mode phone): bg `#F2F3F7`, surface `#FFFFFF`, ink `#1C1E26`, accent `#3A5BA0`, good `#2E7A4E`, bad `#B4432F`.
+- **Status colours**: one green (`--good`) for everything on target and one red (`--bad`) for everything off target.
+- **People** (unchanged): Piepie `#dfc5fe` / ink `#4B2A78` (dark theme `#2E1A4A`); Munny `#ae8774` / ink `#3B261C` (dark theme `#2A1A12`). Used on chips, avatars, the 6 px top border of person cards and the hero split bar.
+- **Logo**: the white “PM.” mark from the owners' artwork (`Linktree Art.png`, git-ignored), extracted by `npm run icons` into `public/pm-mark.png` and drawn in the text colour beside “Pa-Nashe Tracker”. App icons: the mark on `#1C1E26` (favicon.ico 32, apple-touch 180, 192, 512, maskable 512). Manifest and `theme-color`: `#1C1E26`.
 - Radii 8/14/22; one soft shadow; sheets slide up from the bottom on phones and centre on desktop.
 - Respect `prefers-reduced-motion`; visible focus rings; safe-area insets; `viewport-fit=cover`.
 - The memorable element is the raised round capture button; everything else stays quiet.
-
----
 
 ## 8–9. Data facts and attached files
 

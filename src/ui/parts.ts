@@ -31,9 +31,9 @@ export function lineRow(l, k) {
 export function planOnTrack(c: { save?: boolean; actPct: number; planPct: number }) {
   return c.save ? c.actPct >= c.planPct : c.actPct <= c.planPct;
 }
-/** Bar colour for a plan category: red when off track; green for savings and teal for spending when on track. */
+/** Bar colour for a plan category: one green for on target, one red for off target. */
 export function planBarColor(c: { save?: boolean; actPct: number; planPct: number }) {
-  return !planOnTrack(c) ? 'var(--bad)' : c.save ? 'var(--good)' : 'var(--brand)';
+  return planOnTrack(c) ? 'var(--good)' : 'var(--bad)';
 }
 export function hbar(actPct, planPct, color = 'var(--brand)') {
   return `<div class="bar"><span style="width:${Math.max(0, Math.min(100, actPct * 100))}%;background:${color}"></span>${planPct ? `<i style="left:${Math.min(99.5, planPct * 100)}%"></i>` : ''}</div>`;

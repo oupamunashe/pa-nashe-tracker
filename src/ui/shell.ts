@@ -23,14 +23,14 @@ export function shell() {
   document.body.innerHTML = `
   <div class="app">
     <aside class="rail">
-      <div class="brandmark"><span class="dot"></span>Pa-Nashe Tracker</div>
+      <div class="brandmark"><span class="logo" role="img" aria-label="PM"></span>Pa-Nashe Tracker</div>
       <button class="capture-big" data-a="capture">${I.plus}Add a spend</button>
       <nav>${NAV.map(([v, n, ic]) => `<button data-a="nav" data-v="${v}">${I[ic]}${n}</button>`).join('')}</nav>
       <div style="margin-top:auto" class="small muted" id="railwho"></div>
     </aside>
     <div class="main-wrap">
       <header class="topbar"><div class="topbar-in">
-        <div class="brandmark"><span class="dot"></span>Pa-Nashe</div>
+        <div class="brandmark"><span class="logo" role="img" aria-label="PM"></span>Pa-Nashe</div>
         <span class="netchip" id="netchip">${netChip()}</span>
         <div class="monthsw" id="monthsw"></div>
         <button class="who" data-a="who" id="whobtn" aria-label="Who is using this device"></button>

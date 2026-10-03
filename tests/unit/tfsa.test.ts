@@ -44,15 +44,23 @@ describe('contributions in the tax year', () => {
     { d: '2027-02-28', amt: 700, src: 'budget' },                   // last day: counts
     { d: '2027-03-01', amt: 900, src: 'budget' },                   // next tax year
   ].reverse();
-  it('sums money in between 1 March and 28 February only', () => {
-    expect(taxYearContributions(res(ev), '2026-10-02')).toBe(1000 + 2000 + 300 + 700);
-    expect(taxYearContributions(res(ev), '2026-01-10')).toBe(1000);
+  it('sums settled money in from 1 March up to today only', () => {
+    expect(taxYearContributions(res(ev), '2026-10-02')).toBe(1000 + 2000 + 300);          // 28 Feb 2027 not yet
+    expect(taxYearContributions(res(ev), '2027-02-28')).toBe(1000 + 2000 + 300 + 700);    // last day of the year
+    expect(taxYearContributions(res(ev), '2026-01-10')).toBe(0);                           // 28 Feb 2026 still ahead
+    expect(taxYearContributions(res(ev), '2026-02-28')).toBe(1000);
     expect(taxYearContributions(res(ev), '2027-03-05')).toBe(900);
+  });
+  it('a planned contribution dated the 28th counts from that day (advance budgeting)', () => {
+    const planned = [{ d: '2026-10-28', amt: 1000, src: 'budget' }, { d: '2026-09-28', amt: 1000, src: 'budget' }];
+    expect(taxYearContributions(res(planned), '2026-10-03')).toBe(1000);
+    expect(taxYearContributions(res(planned), '2026-10-27')).toBe(1000);
+    expect(taxYearContributions(res(planned), '2026-10-28')).toBe(2000);
   });
   it('TFSA goal uses the tax year; the balance is left alone', () => {
     const g = goalProgress(res(ev, acc({ goal: 10000 }), 9000), '2026-10-02')!;
-    expect(g).toMatchObject({ amount: 4000, taxYear: '2026/27', known: true });
-    expect(g.pct).toBeCloseTo(4000 / 10000, 10);
+    expect(g).toMatchObject({ amount: 3300, taxYear: '2026/27', known: true });
+    expect(g.pct).toBeCloseTo(3300 / 10000, 10);
   });
   it('other goals still measure the balance, as in the prototype', () => {
     const r = res(ev, acc({ n: 'Baby Fund', goal: 2000 }), 500);
@@ -65,7 +73,7 @@ describe('contributions in the tax year', () => {
 describe.skipIf(!hasPrivate)('reference data: TFSA Piepie and TFSA Munny', () => {
   it('tax-year contributions equal the linked line-item entries in the window, split by their shares', async () => {
     await loadState(referenceBackup());
-    const today = '2026-10-02', { start, next } = taxYear(today);
+    const today = '2026-10-02', { start } = taxYear(today);
     const B = balances();
     const tfsas = Object.keys(B).filter(id => isTfsa(B[id].a));
     expect(tfsas.length).toBe(2);
@@ -74,7 +82,7 @@ describe.skipIf(!hasPrivate)('reference data: TFSA Piepie and TFSA Munny', () =>
       // independent sum: every budget entry whose line item is linked to this account, times its share
       let expected = 0;
       for (const m of Object.values<any>(S.months)) for (const t of Object.values<any>(m.txns || {})) {
-        if (!t || t.d < start || t.d >= next) continue;
+        if (!t || t.d < start || t.d > today) continue;
         for (const f of (S.cfg.catalog!.items[t.it]?.fl || [])) if (f.a === id && f.x > 0) expected += f.s * t.amt;
       }
       const got = taxYearContributions(B[id], today);
@@ -83,7 +91,7 @@ describe.skipIf(!hasPrivate)('reference data: TFSA Piepie and TFSA Munny', () =>
       combined += got;
     }
     for (const m of Object.values<any>(S.months)) for (const t of Object.values<any>(m.txns || {}))
-      if (t && t.d >= start && t.d < next && (S.cfg.catalog!.items[t.it]?.fl || []).some((f: any) => tfsas.includes(f.a))) linkedTotal += t.amt;
+      if (t && t.d >= start && t.d <= today && (S.cfg.catalog!.items[t.it]?.fl || []).some((f: any) => tfsas.includes(f.a))) linkedTotal += t.amt;
     expect(combined).toBeCloseTo(linkedTotal, 2);                // both accounts together = everything paid in this tax year
   });
 });

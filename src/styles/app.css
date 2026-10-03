@@ -1,26 +1,31 @@
+/* Colour tokens. Dark is the default look: base #1C1E26, accent #ADC6FF. Settings → Appearance can choose
+   Light (data-theme="light") or Match device (data-theme="auto"). Piepie lavender #dfc5fe and Munny brown
+   #ae8774 are the same in both. One green (--good) marks everything on target, one red (--bad) off target. */
 :root{
-  --bg:#EEF2EF; --surface:#FFFFFF; --surface2:#F6F8F6; --ink:#16302A; --muted:#5B6F69; --faint:#8A9A95; --line:#D6DFDA;
-  --brand:#1F6B5C; --brand-ink:#FFFFFF; --brand-soft:#DCEBE6;
+  --bg:#1C1E26; --surface:#242732; --surface2:#2B2F3C; --ink:#E7E9F0; --muted:#A5AABA; --faint:#7F8495; --line:#363A48;
+  --brand:#ADC6FF; --brand-ink:#1C1E26; --brand-soft:#2E3752;
+  --pp:#dfc5fe; --pp-ink:#2E1A4A; --pp-soft:#3A2E4A; --mm:#ae8774; --mm-ink:#2A1A12; --mm-soft:#3D2F29; --jt:#9DB8C4; --jt-soft:#283440;
+  --good:#6CC394; --good-soft:#1F3529; --bad:#EE8B76; --bad-soft:#41241E; --warn:#E3B45A; --warn-soft:#3A2F18;
+  --r-s:8px; --r-m:14px; --r-l:22px;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  --font-d:'Century Gothic',CenturyGothic,'Urbanist',AppleGothic,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-b:'Century Gothic',CenturyGothic,'Urbanist',AppleGothic,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F2F3F7; --surface:#FFFFFF; --surface2:#F5F6FA; --ink:#1C1E26; --muted:#5A6072; --faint:#868B9C; --line:#DADDE6;
+  --brand:#3A5BA0; --brand-ink:#FFFFFF; --brand-soft:#E2E9FA;
   --pp:#dfc5fe; --pp-ink:#4B2A78; --pp-soft:#F1E6FF; --mm:#ae8774; --mm-ink:#3B261C; --mm-soft:#EADFD9; --jt:#4F6D7A; --jt-soft:#E1EAEE;
   --good:#2E7A4E; --good-soft:#DFF0E5; --bad:#B4432F; --bad-soft:#F7E1DB; --warn:#9A6A12; --warn-soft:#F6EBD3;
-  --r-s:8px; --r-m:14px; --r-l:22px;
-  --shadow:0 1px 2px rgba(22,48,42,.06),0 6px 18px rgba(22,48,42,.06);
-  --font-d:'Bricolage Grotesque',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-  --font-b:'Figtree',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-  color-scheme:light;
+  --shadow:0 1px 2px rgba(28,30,38,.06),0 6px 18px rgba(28,30,38,.07); color-scheme:light;
 }
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-  --bg:#0F1A17; --surface:#16241F; --surface2:#1B2C27; --ink:#E4EEEA; --muted:#A3B5AF; --faint:#7C8E88; --line:#2A3D37;
-  --brand:#5FB8A3; --brand-ink:#0D1A16; --brand-soft:#1F3A33;
-  --pp:#dfc5fe; --pp-ink:#2E1A4A; --pp-soft:#3A2E4A; --mm:#ae8774; --mm-ink:#2A1A12; --mm-soft:#3D2F29; --jt:#9DB8C4; --jt-soft:#22323A;
-  --good:#6CC394; --good-soft:#1C3527; --bad:#EE8B76; --bad-soft:#3E211B; --warn:#E3B45A; --warn-soft:#3A2E16;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark; } }
-:root[data-theme="dark"]{
-  --bg:#0F1A17; --surface:#16241F; --surface2:#1B2C27; --ink:#E4EEEA; --muted:#A3B5AF; --faint:#7C8E88; --line:#2A3D37;
-  --brand:#5FB8A3; --brand-ink:#0D1A16; --brand-soft:#1F3A33;
-  --pp:#dfc5fe; --pp-ink:#2E1A4A; --pp-soft:#3A2E4A; --mm:#ae8774; --mm-ink:#2A1A12; --mm-soft:#3D2F29; --jt:#9DB8C4; --jt-soft:#22323A;
-  --good:#6CC394; --good-soft:#1C3527; --bad:#EE8B76; --bad-soft:#3E211B; --warn:#E3B45A; --warn-soft:#3A2E16;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark; }
+@media (prefers-color-scheme:light){ :root[data-theme="auto"]{
+  --bg:#F2F3F7; --surface:#FFFFFF; --surface2:#F5F6FA; --ink:#1C1E26; --muted:#5A6072; --faint:#868B9C; --line:#DADDE6;
+  --brand:#3A5BA0; --brand-ink:#FFFFFF; --brand-soft:#E2E9FA;
+  --pp:#dfc5fe; --pp-ink:#4B2A78; --pp-soft:#F1E6FF; --mm:#ae8774; --mm-ink:#3B261C; --mm-soft:#EADFD9; --jt:#4F6D7A; --jt-soft:#E1EAEE;
+  --good:#2E7A4E; --good-soft:#DFF0E5; --bad:#B4432F; --bad-soft:#F7E1DB; --warn:#9A6A12; --warn-soft:#F6EBD3;
+  --shadow:0 1px 2px rgba(28,30,38,.06),0 6px 18px rgba(28,30,38,.07); color-scheme:light;
+} }
 
 *{box-sizing:border-box}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}

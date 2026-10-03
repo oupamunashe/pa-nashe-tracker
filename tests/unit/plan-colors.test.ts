@@ -19,9 +19,9 @@ describe('plan category colours', () => {
     expect(planOnTrack(spending(0.34, 0.32))).toBe(false);
     expect(planBarColor(spending(0.34, 0.32))).toBe('var(--bad)');
   });
-  it('spending at or under target is teal', () => {
-    expect(planBarColor(spending(0.32, 0.32))).toBe('var(--brand)');
-    expect(planBarColor(spending(0.11, 0.15))).toBe('var(--brand)');
+  it('spending at or under target is the same green as savings', () => {
+    expect(planBarColor(spending(0.32, 0.32))).toBe('var(--good)');
+    expect(planBarColor(spending(0.11, 0.15))).toBe('var(--good)');
     expect(planOnTrack(spending(0.11, 0.15))).toBe(true);
   });
   it('a category without a target: spending over 0% is red, savings at 0% is green', () => {
