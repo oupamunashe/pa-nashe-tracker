@@ -4,7 +4,7 @@ import { potTotals } from '../../calc/pots';
 import { monthCalc } from '../../calc/month';
 import { peopleCalc } from '../../calc/people';
 import { planCalc } from '../../calc/plan';
-import { GMAP, MONTHS } from '../../core/constants';
+import { GMAP, MONTHS, isHistory } from '../../core/constants';
 import { esc, fmt, fmt0, mName, pct, sum } from '../../core/format';
 import { main, pname, S } from '../../core/state';
 import { allocChips, hbar, planBarColor, planOnTrack, txnLi } from '../parts';
@@ -13,7 +13,7 @@ export function viewHome(k) {
   const mc = monthCalc(k), T = mc.T, pa = peopleCalc(k, 'a');
   const sid = main().scenario || '1', pl = planCalc(k, sid);
   const outs = pa.P.out + pa.M.out + pa.U.out || 1;
-  const due = mc.lines.filter(l => l.k !== 'in' && (l.rec) && !l.act && l.b);
+  const due = isHistory(k) ? [] : mc.lines.filter(l => l.k !== 'in' && (l.rec) && !l.act && l.b);
   const over = mc.lines.filter(l => l.k === 'exp' && l.b && l.act > l.b + 1).sort((a, b) => (b.act - b.b) - (a.act - a.b)).slice(0, 4);
   const bal = balances(), checks = Object.values(bal).filter(r => r.needsCheck);
   const recent = mc.txns.filter(t => t.src !== 'import').sort((a, b) => (b.at || 0) - (a.at || 0) || (b.d || '').localeCompare(a.d || '')).slice(0, 6);
@@ -45,7 +45,7 @@ export function viewHome(k) {
       ${due.length ? `<ul class="list" style="margin:0 -16px -16px">${due.map(l => `
         <li class="li" data-a="line" data-k="${k}" data-id="${l.id}"><div class="grow"><div class="t">${esc(l.it.n)}</div><div class="s">${allocChips(l.al) || esc(GMAP[l.g]?.n || '')}</div></div>
         <div class="v">${fmt(l.b)}</div><button class="btn sm" data-a="markpaid" data-k="${k}" data-id="${l.id}">Mark paid</button></li>`).join('')}</ul>`
-        : `<p class="muted">Every monthly payment in ${MONTHS[+k.slice(5) - 1]} has an amount against it.</p>`}
+        : isHistory(k) ? `<p class="muted">${mName(k)} comes from your old spreadsheet, so nothing is shown as still to pay.</p>` : `<p class="muted">Every monthly payment in ${MONTHS[+k.slice(5) - 1]} has an amount against it.</p>`}
     </section>
     <section class="panel">
       <div class="panel-h"><h2>Against your plan</h2>

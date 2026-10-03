@@ -49,3 +49,15 @@
 .monthsw select.lbl option,.monthsw select.lbl optgroup{color:var(--ink);background:var(--surface)}
 /* Home: same month last year, under each figure */
 .hero .flow .ly{display:block;font-size:.72rem;opacity:.75;margin-top:2px}
+
+/* Year view tables: root sections, groups and lines indented in three even steps (no row against the edge) */
+.tbl.tree th:first-child,.tbl.tree td.lv0{padding-left:16px}
+.tbl.tree td.lv1{padding-left:30px}
+.tbl.tree td.lv2{padding-left:44px}
+@media (max-width:600px){.tbl.tree th:first-child,.tbl.tree td.lv0{padding-left:12px}.tbl.tree td.lv1{padding-left:22px}.tbl.tree td.lv2{padding-left:32px}}
+
+/* Year-on-year change: green = better than the other year, red = worse (dark default; darker shades on light) */
+:root{--yoy-good:#4ADE80;--yoy-bad:#F87171}
+:root[data-theme="light"]{--yoy-good:#15803D;--yoy-bad:#B91C1C}
+@media (prefers-color-scheme:light){:root[data-theme="auto"]{--yoy-good:#15803D;--yoy-bad:#B91C1C}}
+.yoy-good{color:var(--yoy-good)}.yoy-bad{color:var(--yoy-bad)}

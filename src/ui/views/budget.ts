@@ -1,6 +1,6 @@
 /* ===================== BUDGET (from prototype ui1.js) ===================== */
 import { monthCalc } from '../../calc/month';
-import { GROUPS, MONTHS, SECTIONS } from '../../core/constants';
+import { GROUPS, MONTHS, SECTIONS, isHistory } from '../../core/constants';
 import { esc, fmt, fmt0, mName, nextKey, sum } from '../../core/format';
 import { accs, monthKeys, S } from '../../core/state';
 import { I } from '../icons';
@@ -12,7 +12,7 @@ export function viewBudget(k) {
   const isLatest = monthKeys().slice(-1)[0] === k;
   const f = S.ui.bfilter || 'all';
   let lines = mc.lines;
-  if (f === 'due') lines = lines.filter(l => l.k !== 'in' && !l.act && (l.b || l.rec));
+  if (f === 'due') lines = isHistory(k) ? [] : lines.filter(l => l.k !== 'in' && !l.act && (l.b || l.rec));
   if (f === 'over') lines = lines.filter(l => l.k === 'exp' && l.act > l.b + 0.004);
   const col = S.ui.collapsed || (S.ui.collapsed = {});
   const sec = s => {

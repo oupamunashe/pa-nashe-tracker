@@ -1,4 +1,5 @@
 /* ---------- small renderers shared by views and sheets (from prototype ui1.js) ---------- */
+import { isHistory } from '../core/constants';
 import { esc, fmt, fmt0, fmtDate, sum } from '../core/format';
 import { accs, cat, itemKind, pname } from '../core/state';
 
@@ -13,7 +14,7 @@ export function varCls(l) {
   return l.act > l.b + 0.004 ? 'neg' : 'pos';
 }
 export function lineRow(l, k) {
-  const due = (l.rec || l.b) && !l.act && l.k !== 'in';
+  const due = (l.rec || l.b) && !l.act && l.k !== 'in' && !isHistory(k);   // no “Due” on months from the old workbooks
   const left = l.k === 'exp' ? l.b - l.act : l.act - l.b;
   const prog = l.b ? Math.min(100, l.act / l.b * 100) : (l.act ? 100 : 0);
   const over = l.k === 'exp' && l.act > l.b + 0.004;

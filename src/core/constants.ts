@@ -47,4 +47,7 @@ export const ACC_TYPES: Record<string, string> = {
   loan: 'Loan', bank: 'Everyday account', lent: 'Money lent out',
 };
 export const LIAB = new Set(['credit', 'loan']);
+/** Months before this were loaded from the old workbooks: nothing in them is still to pay. */
+export const TRACKER_START = '2026-01';
+export const isHistory = (k: string) => k < TRACKER_START;
 export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

@@ -17,16 +17,16 @@ export function viewYear() {
   const T = Y.tot;
   let rows = '';
   SECTIONS.forEach(s => {
-    rows += `<tr class="g"><td>${s.n}</td>${col(Y.keys.map((_, i) => s.k === 'in' ? T[i][mk].income : T[i][mk][s.k]))}</tr>`;
+    rows += `<tr class="g"><td class="lv0">${s.n}</td>${col(Y.keys.map((_, i) => s.k === 'in' ? T[i][mk].income : T[i][mk][s.k]))}</tr>`;
     GROUPS.filter(g => g.sec === s.k).forEach(g => {
       const its = Y.items.filter(x => x.g === g.k && sum(x[mk]) !== 0);
       if (!its.length) return;
-      rows += `<tr><td style="padding-left:14px;font-weight:650">${esc(g.n)}</td>${col(Y.keys.map((_, i) => sum(its, x => x[mk][i])))}</tr>`;
-      rows += its.map(x => `<tr class="click" data-a="trend" data-id="${x.id}"><td style="padding-left:26px">${esc(x.it.n)}</td>${col(x[mk], 'muted')}</tr>`).join('');
+      rows += `<tr><td class="lv1" style="font-weight:650">${esc(g.n)}</td>${col(Y.keys.map((_, i) => sum(its, x => x[mk][i])))}</tr>`;
+      rows += its.map(x => `<tr class="click" data-a="trend" data-id="${x.id}"><td class="lv2">${esc(x.it.n)}</td>${col(x[mk], 'muted')}</tr>`).join('');
     });
-    if (s.k === 'in' && mode === 'act') rows += `<tr><td style="padding-left:14px">Paid from savings & credit (auto)</td>${col(T.map(t => t.a.auto || 0))}</tr>`;
+    if (s.k === 'in' && mode === 'act') rows += `<tr><td class="lv1">Paid from savings & credit (auto)</td>${col(T.map(t => t.a.auto || 0))}</tr>`;
   });
-  rows += `<tr class="t"><td>Left over</td>${col(T.map(t => t[mk].surplus))}</tr>`;
+  rows += `<tr class="t"><td class="lv0">Left over</td>${col(T.map(t => t[mk].surplus))}</tr>`;
   const lavie = Y.keys.map((_, i) => {
     const g = n => sum(Y.items.filter(x => x.it.n === n), x => x.a[i]);
     return g('La Vie Rentals') - g('La Vie Estate Levies') - g('La Vie Estate Bond') - g('FNB Home Loan Cover') - g('La Vie Municipality Tax');
@@ -42,7 +42,7 @@ export function viewYear() {
       ${barChart([{ n: 'Money in', c: 'var(--brand)', v: T.map(t => t[mk].income) }, { n: 'Saved', c: 'var(--good)', v: T.map(t => t[mk].sav) }, { n: 'Spent', c: 'var(--bad)', v: T.map(t => t[mk].exp) }, { n: 'Left over', c: 'var(--mm)', line: true, v: T.map(t => t[mk].surplus) }], lab, { label: 'Monthly totals' })}
     </section>
     ${cy ? compareYears(y, cy, mk, mode) : ''}
-    <section class="panel flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>${mode === 'act' ? 'Actual' : 'Budget'}</th>${lab.map(l => `<th>${l}</th>`).join('')}<th>Total</th></tr></thead><tbody>${rows}</tbody></table></div></section>
+    <section class="panel flush"><div class="tbl-wrap"><table class="tbl tree"><thead><tr><th>${mode === 'act' ? 'Actual' : 'Budget'}</th>${lab.map(l => `<th>${l}</th>`).join('')}<th>Total</th></tr></thead><tbody>${rows}</tbody></table></div></section>
     <div class="grid3">
       <section class="panel"><h3>La Vie Estate – net position</h3><p class="small muted">Rent less levies, bond, cover and municipal tax.</p>
         <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:750" class="${sum(lavie) < 0 ? 'neg' : 'pos'}">${fmt0(sum(lavie))}</div><div class="small muted">for ${y} so far</div></section>
@@ -68,11 +68,11 @@ function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
   const itemSum = (Y, id) => { const x = Y.items.find(z => z.id === id); return x ? sum(idx, i => x[mk][i]) : 0; };
   // up is good for money in, saved and left over; up is bad for spent
   const chg = (a: number, c: number, upGood: boolean) => {
-    const d = a - c, cls = Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'pos' : 'neg';
+    const d = a - c, cls = Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'yoy-good' : 'yoy-bad';
     return `<td class="${cls}">${Math.abs(d) < 0.5 ? '–' : (d > 0 ? '+' : '') + fmt0(d)}</td><td class="${cls}">${Math.abs(c) > 0.5 && Math.abs(d) >= 0.5 ? (d > 0 ? '+' : '') + pct(d / Math.abs(c)).replace('-', '–') : ''}</td>`;
   };
-  const row = (label: string, a: number, c: number, upGood: boolean, attrs = '', cls = '', pad = 0) =>
-    `<tr class="${cls}" ${attrs}><td style="padding-left:${pad}px">${label}</td><td>${fmt0(a)}</td><td class="muted">${fmt0(c)}</td>${chg(a, c, upGood)}</tr>`;
+  const row = (label: string, a: number, c: number, upGood: boolean, attrs = '', cls = '', lv = 0) =>
+    `<tr class="${cls}" ${attrs}><td class="lv${lv}">${label}</td><td>${fmt0(a)}</td><td class="muted">${fmt0(c)}</td>${chg(a, c, upGood)}</tr>`;
   let rows = '';
   SECTIONS.forEach(sec => {
     const f = t => sec.k === 'in' ? t.income : t[sec.k], up = sec.k !== 'exp';
@@ -82,14 +82,14 @@ function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
       const ids = [...new Set([...A.items, ...C.items].filter(x => x.g === g.k).map(x => x.id))]
         .filter(id => Math.abs(itemSum(A, id)) > 0.004 || Math.abs(itemSum(C, id)) > 0.004);
       if (!ids.length) return;
-      rows += row(`<b>${esc(g.n)}</b>`, sum(ids, id => itemSum(A, id)), sum(ids, id => itemSum(C, id)), up, '', '', 14);
+      rows += row(`<b>${esc(g.n)}</b>`, sum(ids, id => itemSum(A, id)), sum(ids, id => itemSum(C, id)), up, '', '', 1);
       rows += ids.map(id => { const it = (A.items.find(x => x.id === id) || C.items.find(x => x.id === id))!.it;
-        return row(esc(it.n), itemSum(A, id), itemSum(C, id), up, `data-a="trend" data-id="${id}"`, 'click', 26); }).join('');
+        return row(esc(it.n), itemSum(A, id), itemSum(C, id), up, `data-a="trend" data-id="${id}"`, 'click', 2); }).join('');
     });
   });
   rows += row('Left over', tot(A, t => t.surplus), tot(C, t => t.surplus), true, '', 't');
   const kpi = (n: string, f, upGood: boolean) => { const a = tot(A, f), c = tot(C, f), d = a - c;
-    return `<div class="kpi"><span>${n}</span><b>${fmt0(a)}</b><span>${cy}: ${fmt0(c)} · <span class="${Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'pos' : 'neg'}">${Math.abs(d) < 0.5 ? 'same' : (d > 0 ? '+' : '') + fmt0(d)}</span></span></div>`; };
+    return `<div class="kpi"><span>${n}</span><b>${fmt0(a)}</b><span>${cy}: ${fmt0(c)} · <span class="${Math.abs(d) < 0.5 ? '' : (d > 0) === upGood ? 'yoy-good' : 'yoy-bad'}">${Math.abs(d) < 0.5 ? 'same' : (d > 0 ? '+' : '') + fmt0(d)}</span></span></div>`; };
   const lab = idx.map(i => MONTHS[i].slice(0, 3));
   return `<section class="panel"><div class="panel-h"><h2>${y} compared with ${cy}</h2><span class="small muted">${mode === 'act' ? 'Actual' : 'Budget'} · ${span}</span></div>
       <p class="small muted" style="margin:-4px 0 12px">Only months both years have${mk === 'a' ? ' actual entries for' : ''} are compared${idx.length < 12 ? `, so ${y} and ${cy} both cover ${span}` : ''}.</p>
@@ -98,5 +98,5 @@ function compareYears(y: string, cy: string, mk: 'a' | 'b', mode: string) {
       ${barChart([{ n: `Spent ${y}`, c: 'var(--bad)', v: idx.map(i => A.tot[i][mk].exp) }, { n: `Spent ${cy}`, c: 'color-mix(in srgb,var(--bad) 40%,transparent)', v: idx.map(i => C.tot[i][mk].exp) },
         { n: `Left over ${y}`, c: 'var(--mm)', line: true, v: idx.map(i => A.tot[i][mk].surplus) }, { n: `Left over ${cy}`, c: 'var(--faint)', line: true, v: idx.map(i => C.tot[i][mk].surplus) }], lab, { label: `Spent and left over by month, ${y} and ${cy}` })}</div>
     </section>
-    <section class="panel flush"><div class="tbl-wrap"><table class="tbl cmp"><thead><tr><th>${span[0].toUpperCase() + span.slice(1)}</th><th>${y}</th><th>${cy}</th><th>Change</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="panel flush"><div class="tbl-wrap"><table class="tbl tree cmp"><thead><tr><th>${span[0].toUpperCase() + span.slice(1)}</th><th>${y}</th><th>${cy}</th><th>Change</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }

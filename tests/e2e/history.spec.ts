@@ -36,6 +36,37 @@ test('synthetic: month dropdown, last year on Home, year-on-year comparison', as
   await expect(k.nth(2)).toContainText(`Spent${fmt0(cur.exp)}2029: R5,300`);
   const rent = page.locator('table.cmp tr.click', { hasText: 'Rent' });
   await expect(rent.locator('td')).toHaveText(['Rent', 'R4,000', 'R3,500', '+R500', '+14%']);
-  await expect(rent.locator('td').nth(3)).toHaveClass('neg');                        // spending more is shown in red
+  await expect(rent.locator('td').nth(3)).toHaveClass('yoy-bad');                    // spending more: red
+  await expect(rent.locator('td').nth(3)).toHaveCSS('color', 'rgb(248, 113, 113)');  // #F87171
+  const income = page.locator('table.cmp tr.g', { hasText: 'Income' }).locator('td').nth(3);
+  await expect(income).toHaveClass('yoy-good');                                       // more money in: green
+  await expect(income).toHaveCSS('color', 'rgb(74, 222, 128)');                       // #4ADE80
+  await expect(k.nth(2).locator('.yoy-bad')).toHaveCount(1);                          // spent more than 2029
+  // three indentation steps; the root rows don't touch the card edge
+  const pad = (sel: string) => page.locator(`table.cmp td.${sel}`).first().evaluate(e => parseFloat(getComputedStyle(e).paddingLeft));
+  const [p0, p1, p2] = [await pad('lv0'), await pad('lv1'), await pad('lv2')];
+  expect(p0).toBeGreaterThanOrEqual(12); expect(p1).toBeGreaterThan(p0); expect(p2).toBeGreaterThan(p1);
   await expect(page.locator('table.cmp thead th').first()).toHaveText('Jan');       // like for like: January only
+});
+
+test('synthetic: months from the old workbooks (before 2026) show nothing as due', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2030-01-20T10:00:00+02:00'));
+  await page.goto('./?synthetic');
+  await page.waitForFunction(() => document.querySelector('main h1')?.textContent === 'Hi Piepie');
+  // the same unpaid monthly line in a 2025 month and in the fixture's 2030 month
+  await page.evaluate(async () => { const p = (window as any).__pn;
+    await p.db.doc('months/2025-06').set({ y: 2025, m: 6, lines: { rent: { b: 3500, rec: true } }, txns: {}, ledger: {} });
+    await p.db.doc('months/2030-01').update({ lines: { party: { b: 500, rec: true } } }); });
+  const open = (k: string, view: string) => page.evaluate(([k, view]) => { const p = (window as any).__pn; p.S.ui.month = k; p.S.ui.view = view; p.render(); }, [k, view]);
+  await open('2030-01', 'budget');
+  await expect(page.locator('.bl', { hasText: 'Party' }).locator('.chip.warn', { hasText: 'Due' })).toHaveCount(1);
+  await open('2025-06', 'budget');
+  await expect(page.locator('main h1')).toHaveText('June 2025 budget');
+  await expect(page.locator('.bl', { hasText: 'Rent' })).toHaveCount(1);
+  await expect(page.locator('.chip.warn', { hasText: 'Due' })).toHaveCount(0);
+  await page.click('[data-a="bfilter"][data-v="due"]');
+  await expect(page.locator('.bl')).toHaveCount(0);
+  await open('2025-06', 'home');
+  await expect(page.locator('[data-a="markpaid"]')).toHaveCount(0);
+  await expect(page.getByText('June 2025 comes from your old spreadsheet, so nothing is shown as still to pay.')).toBeVisible();
 });
