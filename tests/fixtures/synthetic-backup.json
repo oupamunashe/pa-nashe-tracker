@@ -28,8 +28,8 @@
     },
     "accounts": {
       "accounts": {
-        "tfsa_p": { "n": "TFSA Piepie", "t": "savings", "ow": "P", "open": 100, "od": "2030-01-01" },
-        "tfsa_m": { "n": "TFSA Munny", "t": "savings", "ow": "M", "open": 100, "od": "2030-01-01" },
+        "tfsa_p": { "n": "TFSA Piepie", "t": "savings", "ow": "P", "open": 100, "od": "2030-01-01", "goal": 1000, "gd": "2030-02-28" },
+        "tfsa_m": { "n": "TFSA Munny", "t": "savings", "ow": "M", "open": 100, "od": "2030-01-01", "goal": 1000, "gd": "2030-02-28" },
         "card": { "n": "Test Card", "t": "credit", "ow": "J", "open": null, "od": "2030-01-01", "chk": "Confirm the card balance" },
         "bank_p": { "n": "Everyday Piepie", "t": "bank", "ow": "P", "open": null, "od": "2030-01-01", "track": false }
       }

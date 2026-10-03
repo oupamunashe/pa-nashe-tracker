@@ -1,4 +1,5 @@
 /* ===================== ACCOUNTS (from prototype ui2.js) ===================== */
+import { goalProgress } from '../../calc/tfsa';
 import { balances } from '../../calc/balances';
 import { ACC_TYPES } from '../../core/constants';
 import { esc, fmt, fmt0, fmtDate, pct, sum } from '../../core/format';
@@ -9,7 +10,8 @@ import { val } from '../sheet';
 
 export function accRow(r) {
   const a = r.a; const liab = isLiab(a);
-  const goalPct = a.goal && r.known ? Math.max(0, Math.min(1, r.bal / a.goal)) : null;
+  const gp = goalProgress(r);   // TFSA: this tax year's contributions; other goals: the balance
+  const goalPct = gp && gp.known ? Math.max(0, Math.min(1, gp.pct)) : null;
   const val = a.t === 'bank' && a.track === false ? '<span class="faint small">not tracked</span>'
     : r.known ? `<span class="${liab ? (r.bal > 0.004 ? 'neg' : 'pos') : (r.bal < -0.004 ? 'neg' : '')}">${fmt(r.bal)}</span>` : '<span class="chip warn">Set balance</span>';
   return `<li class="li" data-a="openacc" data-id="${r.id}">
@@ -17,7 +19,7 @@ export function accRow(r) {
     <div class="grow"><div class="t">${esc(a.n)}</div>
       <div class="s">${esc(a.bank || ACC_TYPES[a.t] || '')}${r.needsCheck ? ' · <span class="chip warn">confirm balance</span>' : ''}${a.closed ? ' · closed' : ''}</div>
       ${goalPct !== null ? `<div class="progress-mini" style="max-width:220px"><span style="width:${goalPct * 100}%"></span></div>` : ''}</div>
-    <div class="v">${val}${a.goal ? `<small>goal ${fmt0(a.goal)}</small>` : liab && a.limit ? `<small>limit ${fmt0(a.limit)}</small>` : ''}</div></li>`;
+    <div class="v">${val}${a.goal ? (gp?.taxYear ? `<small>${fmt0(gp.amount)} of ${fmt0(a.goal)} in ${gp.taxYear}</small>` : `<small>goal ${fmt0(a.goal)}</small>`) : liab && a.limit ? `<small>limit ${fmt0(a.limit)}</small>` : ''}</div></li>`;
 }
 export function viewAccounts() {
   const B = balances(); const all = Object.values(B).filter(r => !r.a.closed || S.ui.showClosed);
@@ -61,7 +63,7 @@ export function viewAccount() {
         <div style="font-family:var(--font-d);font-size:2.2rem;font-weight:750" class="amt">${r.known ? fmt(r.bal) : 'Not set'}</div>
         ${!r.known ? `<div class="small muted">Movements since ${fmtDate(a.od)}: ${fmt(r.delta)} (${liab ? 'positive = owing went up' : 'positive = money in'})</div>` : ''}
         ${r.lastCheck ? `<div class="small muted">Last confirmed ${fmtDate(r.lastCheck.d)} at ${fmt(r.lastCheck.bal)}</div>` : ''}</div>
-      ${a.goal ? `<div style="min-width:220px"><div class="row between small"><span>Goal ${fmt0(a.goal)}${a.gd ? ' by ' + fmtDate(a.gd) : ''}</span><b>${r.known ? pct(r.bal / a.goal) : '–'}</b></div>${hbar(r.known ? r.bal / a.goal : 0, 0)}</div>` : ''}
+      ${a.goal ? (() => { const gp = goalProgress(r)!; return `<div style="min-width:220px"><div class="row between small"><span>Goal ${fmt0(a.goal)}${a.gd ? ' by ' + fmtDate(a.gd) : ''}</span><b>${gp.known ? pct(gp.pct) : '–'}</b></div>${hbar(gp.known ? gp.pct : 0, 0)}${gp.taxYear ? `<div class="small muted" style="margin-top:4px">${fmt(gp.amount)} contributed in the ${gp.taxYear} tax year (1 Mar – 28 Feb). The balance includes earlier years.</div>` : ''}</div>`; })() : ''}
       ${liab && a.limit && r.known ? `<div style="min-width:220px"><div class="row between small"><span>Used of ${fmt0(a.limit)} limit</span><b>${pct(r.bal / a.limit)}</b></div>${hbar(r.bal / a.limit, 0, 'var(--bad)')}<div class="small muted" style="margin-top:4px">Available ${fmt(a.limit - r.bal)}</div></div>` : ''}
     </div>
     ${r.needsCheck ? `<div class="notice" style="margin-top:12px">${esc(a.chk)}</div>` : ''}
