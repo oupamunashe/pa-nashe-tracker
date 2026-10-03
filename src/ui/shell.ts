@@ -93,7 +93,7 @@ export function render() {
   const keys = monthKeys();
   ($('#monthsw') as HTMLElement).innerHTML = showMonth ? `
     <button data-a="month" data-k="${prevKey(k)}" ${keys.includes(prevKey(k)) ? '' : 'disabled'} aria-label="Previous month">‹</button>
-    <span class="lbl">${mName(k)}</span>
+    <select class="lbl" data-a="monthsel" aria-label="Month">${[...new Set(keys.map(x => x.slice(0, 4)))].reverse().map(yr => `<optgroup label="${yr}">${keys.filter(x => x.startsWith(yr)).reverse().map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${mName(x)}</option>`).join('')}</optgroup>`).join('')}</select>
     <button data-a="month" data-k="${nextKey(k)}" ${keys.includes(nextKey(k)) ? '' : 'disabled'} aria-label="Next month">›</button>` : '';
   const views: Record<string, (k: string) => string> = { home: viewHome, budget: viewBudget, people: viewPeople, accounts: viewAccounts, account: viewAccount, plan: viewPlan, year: viewYear, milestones: viewMilestones, milestone: viewMilestone, more: viewMore, items: viewItems };
   main.innerHTML = (views[v] || viewHome)(k);

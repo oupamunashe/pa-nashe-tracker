@@ -42,3 +42,10 @@
 .pots-home .kpi{font:inherit;color:inherit;text-align:left;cursor:pointer}
 .pots-home .kpi:hover{border-color:var(--brand)}
 .kpis.three{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+
+/* Month switcher: the month name is a dropdown of every month (grouped by year) */
+.monthsw select.lbl{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:inherit;font:inherit;font-weight:650;font-family:var(--font-d);cursor:pointer;text-align:center;text-align-last:center;padding:0 6px;height:34px;border-radius:999px}
+.monthsw select.lbl:hover{background:var(--surface2)}
+.monthsw select.lbl option,.monthsw select.lbl optgroup{color:var(--ink);background:var(--surface)}
+/* Home: same month last year, under each figure */
+.hero .flow .ly{display:block;font-size:.72rem;opacity:.75;margin-top:2px}

@@ -72,6 +72,8 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   const t: any = e.target;
   if (t.matches('[data-a="yearsel"]')) { S.ui.year = t.value; render(); }
+  if (t.matches('[data-a="monthsel"]')) { S.ui.month = t.value; render(); }
+  if (t.matches('[data-a="cmpyear"]')) { S.ui.cmpYear = t.value; render(); }
   if (t.matches('[data-a="tfsayear"]')) { S.ui.tfsaYear = t.value; render(); }
   if (t.matches('[data-a="msfile"]')) msAttach(t.dataset.id, t.files[0]);
   if (t.matches('[data-calc]')) {

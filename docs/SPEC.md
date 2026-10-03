@@ -234,7 +234,7 @@ Totals on the Accounts screen exclude accounts that still need a check and say �
 - **Big purchase**: car target = max(0, depositPct × carPrice − tradeIn) + upfront; instalment = PMT(rate/12, 48, carPrice × (1 − depositPct)); months at everyday and sprint (Scenario 2 goals fixed amount); Zim stand full = (standUsd × (1 + transferPct) + servicesUsd) × fx × (1 + fxBuffer); deposit = depositShare × standUsd × fx × (1 + fxBuffer).
 
 ### 5.5 Year (`yearCalc(y)`)
-12 columns; per item budget and actual arrays; per month totals from `monthCalc`. Memo cards: La Vie net position (rent − levies − bond − FNB home loan cover − municipality tax), Owner’s loan balance (`biz_loan`), La Vie vacancy reserve (`g_lavie`).
+12 columns; per item budget and actual arrays; per month totals from `monthCalc`. **Compare with** another year (Year view): only months both years have (with actual entries, when showing actuals) are compared, so a part year is set against the same months of the other; KPIs, monthly spent/left-over chart and a table of every section, group and line with change in rand and %. Green = better (more in, saved or left over; less spent; less drawn from funding). Memo cards: La Vie net position (rent − levies − bond − FNB home loan cover − municipality tax), Owner’s loan balance (`biz_loan`), La Vie vacancy reserve (`g_lavie`).
 
 ### 5.6 Starting a month (`startMonth`)
 Copies from the latest month every line that is monthly (`rec` on the line or the item), or has a budget and is not in the once-off group. Copies `b`, `al`, `rec`; drops notes and transactions. Monthly expense/savings lines with no actual show a “Due” chip and appear in Home → “Still to pay” with **Mark paid** (creates a transaction for the budget amount, dated today if this month else the 28th, paid by the single allocated person or the device user).
@@ -262,18 +262,18 @@ Workbook sheets: `Overview <year>` (sections → groups → items × 12 months +
 
 ## 6. Screens
 
-Navigation: phone – top bar (logo dot, month switcher, “who” button) + bottom tab bar (Home, Budget, round **+ Add** capture button raised in the centre, Accounts, More). Desktop ≥ 980 px – left rail (logo, “Add a spend” button, Home, Budget, Piepie & Munny, Accounts, Plan, Year view, Milestones, More) and no tab bar. Month switcher shows only on Home, Budget, People, Plan. Before anything else: the **sign-in screen** (§2.3). After sign-in, the device user (`S.me`) comes from the signed-in member’s `person`, so the prototype’s first-run “Who’s using this device?” sheet is no longer shown automatically; Settings → This device still lets them switch who new entries default to (“Piepie” and “Munny” only on the buttons).
+Navigation: phone – top bar (logo dot, month switcher, “who” button) + bottom tab bar (Home, Budget, round **+ Add** capture button raised in the centre, Accounts, More). Desktop ≥ 980 px – left rail (logo, “Add a spend” button, Home, Budget, Piepie & Munny, Accounts, Plan, Year view, Milestones, More) and no tab bar. Month switcher shows only on Home, Budget, People, Plan; its month name is a dropdown of every month, grouped by year (newest first). Before anything else: the **sign-in screen** (§2.3). After sign-in, the device user (`S.me`) comes from the signed-in member’s `person`, so the prototype’s first-run “Who’s using this device?” sheet is no longer shown automatically; Settings → This device still lets them switch who new entries default to (“Piepie” and “Munny” only on the buttons).
 
 | Screen | Content |
 |---|---|
-| Home | “Hi Piepie”; green hero: left after savings and spending (big), planned, Money in / Saved / Spent tiles, bar of who covered outgoings (lavender/brown); Still to pay (Mark paid); Against your plan (scenario 1/2/3 segmented, six bars with target tick, net savings rate); Needs a look (balances to confirm, top over-budget lines); Latest entries (app-captured); two person cards |
+| Home | “Hi Piepie”; green hero: left after savings and spending (big), planned, Money in / Saved / Spent tiles (each with the same month last year when there is one), bar of who covered outgoings (lavender/brown); Still to pay (Mark paid); Against your plan (scenario 1/2/3 segmented, six bars with target tick, net savings rate); Needs a look (balances to confirm, top over-budget lines); Latest entries (app-captured); two person cards |
 | Budget | Title, Add line, Start <next month> (latest month only); four KPI tiles; filter All lines / Still to pay / Over budget; Income, Savings & Investments, Expenses panels with collapsible groups; columns Line item / Budget / Actual / (wide) Left or Variance; chips for allocation, Monthly, Due, “n entries”; thin progress bar per expense line; Left over panel |
 | Line sheet | KPI tiles; budget input; Every month toggle; Who pays presets (All Piepie, All Munny, 50/50, Not allocated) and split rows (person, label, value, R/% toggle, remove); remaining text; notes; entries list; Remove from month / Mark paid / Save |
 | Piepie & Munny | Budget/Actual toggle; three cards: Piepie, Munny, Not allocated yet – each with surplus and income/paying-for lists |
 | Accounts | Move money, Import statement, New account; KPIs (Savings, Debt owed, Owed to you, Balances to confirm); notice; lists by type with owner avatar, bank, confirm chip, goal progress |
 | Account | Check balance, Move money, Add entry, Import statement, Edit; balance, goal/limit bars, notices; history with running balance |
 | Plan | Scenario segmented control; description; plan base input; table by summary category and bucket with editable target %; drawdowns and net savings rows; four calculator panels with editable inputs |
-| Year view | Year select, Actual/Budget; bar chart (money in, saved, spent) + left-over line; full table; three memo cards; tap a row → trend sheet with budget vs actual bars |
+| Year view | Year select, Compare with (another year), Actual/Budget; comparison panel when a year is picked; bar chart (money in, saved, spent) + left-over line; full table; three memo cards; tap a row → trend sheet with budget vs actual bars |
 | Milestones | Cards with status, dates, spent vs planned bar, funding; detail with KPIs, lines table, payments, documents |
 | More | People, Plan, Year, Milestones; Import statement, Export to Excel, Download a full backup; Line items & categories; Settings |
 | Settings | Name in the app + name on bank statements + other names, per person; this device; appearance (match device / light / dark); **signed in as … · Change password · Sign out** |
@@ -294,6 +294,9 @@ Updated after the port (October 2026): dark-first look, Century Gothic, PM logo.
 - Radii 8/14/22; one soft shadow; sheets slide up from the bottom on phones and centre on desktop.
 - Respect `prefers-reduced-motion`; visible focus rings; safe-area insets; `viewport-fit=cover`.
 - The memorable element is the raised round capture button; everything else stays quiet.
+
+### History (October 2023 – December 2025)
+Built from the owners' 2024 and 2025 workbooks (git-ignored) by `private/tools/extract_history.py` and `build_history.py`, loaded by `private/tools/seed-history.mts` (additive; backs up first). Month documents have the 2026 shape. Recurring costs use the 2026 line items; lines that repeat but no longer exist are **archived** items (`arch: true`, hidden from pickers); single-month extras sit under a general item of their group with the sheet's label as the entry's note. Entries are dated the 28th (`src: 'import'`). Account balances are unaffected (every account's opening date is in 2026). `tests/unit/history.test.ts` checks every month against the workbook totals when `private/` is present.
 
 ## 8–9. Data facts and attached files
 

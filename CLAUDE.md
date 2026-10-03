@@ -52,6 +52,7 @@ Stack: Vite + TypeScript (no UI framework) · Supabase (Postgres JSON documents,
 - `npm run seed -- <backup.json> --yes` – same as above without the question (only when the owners have said so)
 - `npm run build` – production build; deployment happens via GitHub Actions on push to `main` (`.github/workflows/deploy.yml`: typecheck, tests, secret check, build, Pages). Live: https://oupamunashe.github.io/pa-nashe-tracker/
 - `npm run build && npm run preview` – the production build locally (service worker, installable) at http://localhost:4173/pa-nashe-tracker/
+- `python3 private/tools/extract_history.py && python3 private/tools/build_history.py <db snapshot.json>` then `npx tsx private/tools/seed-history.mts [--apply]` – rebuild / load the 2023–2025 history from the workbooks in `private/` (additive; backs up first; see SPEC “History”)
 - `npm run icons` – regenerate the logo mark and PWA icons in `public/` from `Linktree Art.png` (project root, git-ignored – a personal photo; only the white mark is published)
 - Pushing a change to `.github/workflows/` needs a GitHub token with the `workflow` scope
 

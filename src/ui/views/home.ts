@@ -18,6 +18,7 @@ export function viewHome(k) {
   const bal = balances(), checks = Object.values(bal).filter(r => r.needsCheck);
   const recent = mc.txns.filter(t => t.src !== 'import').sort((a, b) => (b.at || 0) - (a.at || 0) || (b.d || '').localeCompare(a.d || '')).slice(0, 6);
   const hi = S.me ? 'Hi ' + esc(pname(S.me)) : 'Hello';
+  const lyK = (+k.slice(0, 4) - 1) + k.slice(4), ly = S.months[lyK] ? monthCalc(lyK).T.a : null, lyName = mName(lyK).replace(/^(\w{3})\w*/, '$1');   // same month last year
   return `<div class="stack">
   <div class="pagehead"><div><h1>${hi}</h1><p class="muted">${mName(k)} at a glance</p></div></div>
   <section class="hero">
@@ -25,9 +26,9 @@ export function viewHome(k) {
     <div class="big amt">${fmt(T.a.surplus)}</div>
     <div class="small" style="opacity:.85">Planned: ${fmt(T.b.surplus)}</div>
     <div class="flow">
-      <div><span>Money in</span><b class="amt">${fmt0(T.a.income)}</b></div>
-      <div><span>Saved</span><b class="amt">${fmt0(T.a.sav)}</b></div>
-      <div><span>Spent</span><b class="amt">${fmt0(T.a.exp)}</b></div>
+      <div><span>Money in</span><b class="amt">${fmt0(T.a.income)}</b>${ly ? `<small class="ly">${esc(lyName)}: ${fmt0(ly.income)}</small>` : ''}</div>
+      <div><span>Saved</span><b class="amt">${fmt0(T.a.sav)}</b>${ly ? `<small class="ly">${esc(lyName)}: ${fmt0(ly.sav)}</small>` : ''}</div>
+      <div><span>Spent</span><b class="amt">${fmt0(T.a.exp)}</b>${ly ? `<small class="ly">${esc(lyName)}: ${fmt0(ly.exp)}</small>` : ''}</div>
     </div>
     <div class="split" title="Who covered this month’s outgoings">
       <span style="width:${pa.P.out / outs * 100}%;background:var(--pp)"></span>
